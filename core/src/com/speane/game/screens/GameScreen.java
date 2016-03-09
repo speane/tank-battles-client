@@ -12,6 +12,8 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Tank;
+import com.speane.game.transfers.SomeRequest;
+import com.speane.game.transfers.TankMovement;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -59,14 +61,25 @@ public class GameScreen extends ScreenAdapter {
 
     private void registerClasses() {
         Kryo kryo = client.getKryo();
+        //kryo.register(String.class);
+        kryo.register(SomeRequest.class);
+        kryo.register(TankMovement.class);
     }
 
     private void initNetworkListener() {
         Listener listener = new Listener() {
             @Override
             public void received(Connection c, Object o) {
-                if (o instanceof String) {
-                    System.out.println(o);
+                if (o instanceof SomeRequest) {
+                    SomeRequest response = (SomeRequest) o;
+                    System.out.println(response.text);
+                    System.out.println(response.x);
+                    System.out.println(response.y);
+                }
+
+                if (o instanceof TankMovement) {
+                    player.moveX(((TankMovement) o).x);
+                    player.moveY(((TankMovement) o).y);
                 }
             }
         };
