@@ -7,7 +7,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +24,8 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private Texture tankTexture;
     private Texture enemyTexture;
+
+    private Client client;
 
     ArrayList<Tank> enemies;
 
@@ -35,11 +42,51 @@ public class GameScreen extends ScreenAdapter {
         batch = new SpriteBatch();
         tankTexture = new Texture("tank.png");
         enemyTexture = new Texture("enemy.png");
+
+        initClient();
+    }
+
+    private void initClient() {
+        client = new Client();
+        Kryo kryo = client.getKryo();
+        kryo.register(SomeRequest.class);
+
+
+        client.start();
+        try {
+            client.connect(5000, "localhost", 7777);
+        } catch (IOException e) {
+            System.out.println("Unable to connect");
+        }
+        client.addListener(new Listener() {
+            @Override
+            public void received(Connection c, Object o) {
+                /*if (o instanceof TankMove) {
+                    System.out.println("TankMove");
+                    player.moveY(((Movement) o).dY);
+                    System.out.println(((Movement) o).dX);
+                    player.moveX(((Movement) o).dX);
+                }*/
+                if (o instanceof SomeRequest) {
+                    /*System.out.println(o);
+                    System.out.println(((TankMove) o).dX);
+                    System.out.println(((TankMove) o).dY);
+                    player.moveX(((TankMove) o).dX);
+                    player.moveY(((TankMove) o).dY);*/
+                    System.out.println(((SomeRequest) o).text);
+                    System.out.println(((SomeRequest) o).x);
+                    System.out.println(((SomeRequest) o).y);
+                    player.moveX(((SomeRequest) o).x);
+                    player.moveY(((SomeRequest) o).y);
+                }
+            }
+        });
     }
 
     private void addEnemy(int x, int y) {
         enemies.add(new Tank(x, y));
     }
+
 
     @Override
     public void render(float delta) {
