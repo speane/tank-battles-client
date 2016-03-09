@@ -1,4 +1,4 @@
-package com.speane.game;
+package com.speane.game.entities;
 
 /**
  * Created by Speane on 08.03.2016.

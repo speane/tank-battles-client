@@ -1,4 +1,4 @@
-package com.speane.game;
+package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,9 +11,11 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.speane.game.entities.Tank;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -27,29 +29,77 @@ public class GameScreen extends ScreenAdapter {
 
     private Client client;
 
-    ArrayList<Tank> enemies;
+    private Map<Integer, Tank> enemies;
 
     @Override
     public void show() {
-        super.show();
+        loadResourses();
+        initEntities();
+        initNetwork();
+    }
 
+    @Override
+    public void render(float delta) {
+        queryInput();
+        clearScreen();
+        draw();
+    }
+
+    private void initNetwork() {
+        client = new Client();
+        registerClasses();
+        client.start();
+        try {
+            client.connect(5000, "localhost", 7777);
+        } catch (IOException e) {
+            System.out.println("Unable to connect");
+        }
+        initNetworkListener();
+    }
+
+    private void registerClasses() {
+        Kryo kryo = client.getKryo();
+    }
+
+    private void initNetworkListener() {
+        Listener listener = new Listener() {
+            @Override
+            public void received(Connection c, Object o) {
+                if (o instanceof String) {
+                    System.out.println(o);
+                }
+            }
+        };
+
+        client.addListener(new Listener.QueuedListener(listener) {
+            @Override
+            protected void queue(Runnable runnable) {
+                Gdx.app.postRunnable(runnable);
+            }
+        });
+    }
+
+    private void initEntities() {
+        initTanks();
+    }
+
+    private void initTanks() {
         player = new Tank(0, 0);
-        enemies = new ArrayList<Tank>();
+        enemies = new HashMap<>();
+        enemies.put(1, new Tank(90,29));
+        enemies.put(2, new Tank(345, 256));
+    }
 
-        addEnemy(70, 233);
-        addEnemy(90, 80);
-
+    private void loadResourses() {
         batch = new SpriteBatch();
         tankTexture = new Texture("tank.png");
         enemyTexture = new Texture("enemy.png");
-
-        initClient();
     }
 
     private void initClient() {
         client = new Client();
         Kryo kryo = client.getKryo();
-        kryo.register(SomeRequest.class);
+        //kryo.register(SomeRequest.class);
 
 
         client.start();
@@ -58,44 +108,18 @@ public class GameScreen extends ScreenAdapter {
         } catch (IOException e) {
             System.out.println("Unable to connect");
         }
-        client.addListener(new Listener() {
+        Listener listener = new Listener() {
             @Override
             public void received(Connection c, Object o) {
-                /*if (o instanceof TankMove) {
-                    System.out.println("TankMove");
-                    player.moveY(((Movement) o).dY);
-                    System.out.println(((Movement) o).dX);
-                    player.moveX(((Movement) o).dX);
-                }*/
-                if (o instanceof SomeRequest) {
-                    /*System.out.println(o);
-                    System.out.println(((TankMove) o).dX);
-                    System.out.println(((TankMove) o).dY);
-                    player.moveX(((TankMove) o).dX);
-                    player.moveY(((TankMove) o).dY);*/
-                    System.out.println(((SomeRequest) o).text);
-                    System.out.println(((SomeRequest) o).x);
-                    System.out.println(((SomeRequest) o).y);
-                    player.moveX(((SomeRequest) o).x);
-                    player.moveY(((SomeRequest) o).y);
-                }
+            }
+        };
+
+        client.addListener(new Listener.QueuedListener(listener) {
+            @Override
+            protected void queue(Runnable runnable) {
+                Gdx.app.postRunnable(runnable);
             }
         });
-    }
-
-    private void addEnemy(int x, int y) {
-        enemies.add(new Tank(x, y));
-    }
-
-
-    @Override
-    public void render(float delta) {
-        super.render(delta);
-
-        queryInput();
-
-        clearScreen();
-        draw();
     }
 
     private void draw() {
@@ -108,7 +132,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void drawEnemies() {
-        for (Tank enemy : enemies) {
+        for (Tank enemy : enemies.values()) {
             drawEnemyTank(enemy);
         }
     }
