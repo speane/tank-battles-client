@@ -12,8 +12,8 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Tank;
-import com.speane.game.transfers.SomeRequest;
-import com.speane.game.transfers.TankMovement;
+import com.speane.game.transfers.CreatePlayer;
+import com.speane.game.transfers.MoveTank;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        loadResourses();
+        loadResources();
         initEntities();
         initNetwork();
     }
@@ -50,9 +50,9 @@ public class GameScreen extends ScreenAdapter {
     private void initNetwork() {
         client = new Client();
         registerClasses();
-        client.start();
+        new Thread(client).start();
         try {
-            client.connect(5000, "localhost", 7777);
+            client.connect(20000, "localhost", 7777);
         } catch (IOException e) {
             System.out.println("Unable to connect");
         }
@@ -61,25 +61,23 @@ public class GameScreen extends ScreenAdapter {
 
     private void registerClasses() {
         Kryo kryo = client.getKryo();
-        //kryo.register(String.class);
-        kryo.register(SomeRequest.class);
-        kryo.register(TankMovement.class);
+        kryo.register(MoveTank.class);
+        kryo.register(CreatePlayer.class);
     }
 
     private void initNetworkListener() {
         Listener listener = new Listener() {
             @Override
             public void received(Connection c, Object o) {
-                if (o instanceof SomeRequest) {
-                    SomeRequest response = (SomeRequest) o;
-                    System.out.println(response.text);
-                    System.out.println(response.x);
-                    System.out.println(response.y);
+                if (o instanceof MoveTank) {
+                    MoveTank moveTank = (MoveTank) o;
+                    Tank enemy = enemies.get(moveTank.id);
+                    enemy.setX(moveTank.x);
+                    enemy.setY(moveTank.y);
                 }
-
-                if (o instanceof TankMovement) {
-                    player.moveX(((TankMovement) o).x);
-                    player.moveY(((TankMovement) o).y);
+                if (o instanceof CreatePlayer) {
+                    CreatePlayer newPlayer = (CreatePlayer) o;
+                    enemies.put(newPlayer.id, new Tank(newPlayer.x, newPlayer.y));
                 }
             }
         };
@@ -99,40 +97,12 @@ public class GameScreen extends ScreenAdapter {
     private void initTanks() {
         player = new Tank(0, 0);
         enemies = new HashMap<>();
-        enemies.put(1, new Tank(90,29));
-        enemies.put(2, new Tank(345, 256));
     }
 
-    private void loadResourses() {
+    private void loadResources() {
         batch = new SpriteBatch();
         tankTexture = new Texture("tank.png");
         enemyTexture = new Texture("enemy.png");
-    }
-
-    private void initClient() {
-        client = new Client();
-        Kryo kryo = client.getKryo();
-        //kryo.register(SomeRequest.class);
-
-
-        client.start();
-        try {
-            client.connect(5000, "localhost", 7777);
-        } catch (IOException e) {
-            System.out.println("Unable to connect");
-        }
-        Listener listener = new Listener() {
-            @Override
-            public void received(Connection c, Object o) {
-            }
-        };
-
-        client.addListener(new Listener.QueuedListener(listener) {
-            @Override
-            protected void queue(Runnable runnable) {
-                Gdx.app.postRunnable(runnable);
-            }
-        });
     }
 
     private void draw() {
@@ -164,6 +134,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void queryInput() {
+        boolean moved = false;
+
         boolean lPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
         boolean uPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
@@ -171,15 +143,26 @@ public class GameScreen extends ScreenAdapter {
 
         if (lPressed) {
             player.moveX(-2);
+            moved = true;
         }
         if (rPressed) {
             player.moveX(2);
+            moved = true;
         }
         if (uPressed) {
             player.moveY(2);
+            moved = true;
         }
         if (dPressed) {
             player.moveY(-2);
+            moved = true;
+        }
+
+        if (moved) {
+            MoveTank moveTank = new MoveTank();
+            moveTank.x = player.getX();
+            moveTank.y = player.getY();
+            client.sendTCP(moveTank);
         }
     }
 }
