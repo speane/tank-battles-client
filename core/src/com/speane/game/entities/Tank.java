@@ -1,5 +1,7 @@
 package com.speane.game.entities;
 
+import java.util.ArrayList;
+
 /**
  * Created by Speane on 08.03.2016.
  */
@@ -7,7 +9,19 @@ public class Tank {
     private int x;
     private int y;
 
+    public ArrayList<Bullet> getBullets() {
+        return bullets;
+    }
+
+    private ArrayList<Bullet> bullets;
+
+    public void shoot() {
+        Bullet bullet = new Bullet((x + 50), y + 100);
+        bullets.add(bullet);
+    }
+
     public Tank(int x, int y) {
+        bullets = new ArrayList<>();
         this.x = x;
         this.y = y;
     }
