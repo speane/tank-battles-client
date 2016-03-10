@@ -11,11 +11,14 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
 import com.speane.game.transfers.CreatePlayer;
 import com.speane.game.transfers.MoveTank;
+import com.speane.game.transfers.ShootTank;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +31,7 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private Texture tankTexture;
     private Texture enemyTexture;
+    private Texture bulletTexture;
 
     private Client client;
 
@@ -43,8 +47,22 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         queryInput();
+        updateAllBullets();
         clearScreen();
         draw();
+    }
+
+    private void updateAllBullets() {
+        updateTankBullets(player);
+        for (Tank enemy : enemies.values()) {
+            updateTankBullets(enemy);
+        }
+    }
+
+    private void updateTankBullets(Tank tank) {
+        for (Bullet bullet : tank.getBullets()) {
+            bullet.moveY(3);
+        }
     }
 
     private void initNetwork() {
@@ -63,6 +81,7 @@ public class GameScreen extends ScreenAdapter {
         Kryo kryo = client.getKryo();
         kryo.register(MoveTank.class);
         kryo.register(CreatePlayer.class);
+        kryo.register(ShootTank.class);
     }
 
     private void initNetworkListener() {
@@ -78,6 +97,12 @@ public class GameScreen extends ScreenAdapter {
                 if (o instanceof CreatePlayer) {
                     CreatePlayer newPlayer = (CreatePlayer) o;
                     enemies.put(newPlayer.id, new Tank(newPlayer.x, newPlayer.y));
+                }
+                if (o instanceof ShootTank) {
+                    ShootTank shootTank = (ShootTank) o;
+                    Tank tank = enemies.get(shootTank.id);
+                    tank.shoot();
+                    System.out.println("Shoot " + ((ShootTank) o).id);
                 }
             }
         };
@@ -103,6 +128,7 @@ public class GameScreen extends ScreenAdapter {
         batch = new SpriteBatch();
         tankTexture = new Texture("tank.png");
         enemyTexture = new Texture("enemy.png");
+        bulletTexture = new Texture("bullet.png");
     }
 
     private void draw() {
@@ -121,15 +147,23 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void drawTank(Tank tank) {
+        drawBullets(tank.getBullets());
         batch.draw(tankTexture, tank.getX(), tank.getY());
     }
 
+    private void drawBullets(ArrayList<Bullet> bullets) {
+        for (Bullet bullet : bullets) {
+            batch.draw(bulletTexture, bullet.getX(), bullet.getY());
+        }
+    }
+
     private void drawEnemyTank(Tank tank) {
+        drawBullets(tank.getBullets());
         batch.draw(enemyTexture, tank.getX(), tank.getY());
     }
 
     private void clearScreen() {
-        Gdx.gl.glClearColor(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, Color.BLACK.a);
+        Gdx.gl.glClearColor(0.75f, 0.9f, 0.8f, Color.BLACK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
@@ -140,6 +174,7 @@ public class GameScreen extends ScreenAdapter {
         boolean rPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
         boolean uPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
         boolean dPressed = Gdx.input.isKeyPressed(Input.Keys.DOWN);
+        boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
 
         if (lPressed) {
             player.moveX(-2);
@@ -156,6 +191,12 @@ public class GameScreen extends ScreenAdapter {
         if (dPressed) {
             player.moveY(-2);
             moved = true;
+        }
+
+        if (spacePressed) {
+            player.shoot();
+            ShootTank shootTank = new ShootTank();
+            client.sendTCP(shootTank);
         }
 
         if (moved) {

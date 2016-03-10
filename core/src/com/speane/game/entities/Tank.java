@@ -16,7 +16,7 @@ public class Tank {
     private ArrayList<Bullet> bullets;
 
     public void shoot() {
-        Bullet bullet = new Bullet((x + 50), y + 100);
+        Bullet bullet = new Bullet((x + 35), y + 100);
         bullets.add(bullet);
     }
 
