@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.speane.game.help.Settings.*;
+import static com.speane.game.help.Messages.*;
+
 /**
  * Created by Speane on 08.03.2016.
  */
@@ -70,9 +73,9 @@ public class GameScreen extends ScreenAdapter {
         registerClasses();
         new Thread(client).start();
         try {
-            client.connect(20000, "localhost", 7777);
+            client.connect(CLIENT_WAIT_TIMEOUT, SERVER_IP, PORT);
         } catch (IOException e) {
-            System.out.println("Unable to connect");
+            System.out.println(CONNECTION_FAILED_MESSAGE);
         }
         initNetworkListener();
     }
@@ -121,7 +124,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void initTanks() {
         player = new Tank(0, 0);
-        enemies = new HashMap<>();
+        enemies = new HashMap<Integer, Tank>();
     }
 
     private void loadResources() {

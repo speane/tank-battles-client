@@ -21,7 +21,7 @@ public class Tank {
     }
 
     public Tank(int x, int y) {
-        bullets = new ArrayList<>();
+        bullets = new ArrayList<Bullet>();
         this.x = x;
         this.y = y;
     }
