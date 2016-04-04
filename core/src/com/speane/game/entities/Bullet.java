@@ -4,22 +4,22 @@ package com.speane.game.entities;
  * Created by Speane on 10.03.2016.
  */
 public class Bullet {
-    public Bullet(int x, int y) {
+    public Bullet(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    private int x;
+    private float x;
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    private int y;
+    private float y;
     public void moveX(int dX) {
         x += dX;
     }

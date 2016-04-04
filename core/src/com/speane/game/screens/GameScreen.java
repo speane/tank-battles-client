@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -35,6 +36,7 @@ public class GameScreen extends ScreenAdapter {
     private Texture tankTexture;
     private Texture enemyTexture;
     private Texture bulletTexture;
+    private Touchpad touchpad;
 
     private Client client;
 
@@ -45,6 +47,7 @@ public class GameScreen extends ScreenAdapter {
         loadResources();
         initEntities();
         initNetwork();
+        touchpad = new Touchpad(0, new Touchpad.TouchpadStyle());
     }
 
     @Override
@@ -96,10 +99,11 @@ public class GameScreen extends ScreenAdapter {
                     Tank enemy = enemies.get(moveTank.id);
                     enemy.setX(moveTank.x);
                     enemy.setY(moveTank.y);
+                    enemy.setRotation(moveTank.rotation);
                 }
                 if (o instanceof CreatePlayer) {
                     CreatePlayer newPlayer = (CreatePlayer) o;
-                    enemies.put(newPlayer.id, new Tank(newPlayer.x, newPlayer.y));
+                    enemies.put(newPlayer.id, new Tank(newPlayer.x, newPlayer.y, newPlayer.rotation));
                 }
                 if (o instanceof ShootTank) {
                     ShootTank shootTank = (ShootTank) o;
@@ -123,7 +127,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initTanks() {
-        player = new Tank(0, 0);
+        player = new Tank(0, 0, 0);
         enemies = new HashMap<Integer, Tank>();
     }
 
@@ -139,6 +143,7 @@ public class GameScreen extends ScreenAdapter {
 
         drawEnemies();
         drawTank(player);
+        touchpad.draw(batch, 12);
 
         batch.end();
     }
@@ -151,7 +156,24 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawTank(Tank tank) {
         drawBullets(tank.getBullets());
-        batch.draw(tankTexture, tank.getX(), tank.getY());
+        batch.draw(
+                tankTexture,
+                tank.getX(),
+                tank.getY(),
+                tankTexture.getWidth() / 2,
+                tankTexture.getHeight() / 2,
+                tankTexture.getWidth(),
+                tankTexture.getHeight(),
+                1,
+                1,
+                tank.getRotation(),
+                0,
+                0,
+                tankTexture.getWidth(),
+                tankTexture.getHeight(),
+                false,
+                false
+        );
     }
 
     private void drawBullets(ArrayList<Bullet> bullets) {
@@ -162,7 +184,24 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawEnemyTank(Tank tank) {
         drawBullets(tank.getBullets());
-        batch.draw(enemyTexture, tank.getX(), tank.getY());
+        batch.draw(
+                enemyTexture,
+                tank.getX(),
+                tank.getY(),
+                enemyTexture.getWidth() / 2,
+                enemyTexture.getHeight() / 2,
+                enemyTexture.getWidth(),
+                enemyTexture.getHeight(),
+                1,
+                1,
+                tank.getRotation(),
+                0,
+                0,
+                enemyTexture.getWidth(),
+                enemyTexture.getHeight(),
+                false,
+                false
+        );
     }
 
     private void clearScreen() {
@@ -180,19 +219,21 @@ public class GameScreen extends ScreenAdapter {
         boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
 
         if (lPressed) {
-            player.moveX(-2);
+            player.rotate(1);
             moved = true;
+            System.out.println(player.getRotation());
         }
         if (rPressed) {
-            player.moveX(2);
+            player.rotate(-1);
             moved = true;
+            System.out.println(player.getRotation());
         }
         if (uPressed) {
-            player.moveY(2);
+            player.moveForward(2);
             moved = true;
         }
         if (dPressed) {
-            player.moveY(-2);
+            player.moveBackward();
             moved = true;
         }
 
@@ -206,6 +247,7 @@ public class GameScreen extends ScreenAdapter {
             MoveTank moveTank = new MoveTank();
             moveTank.x = player.getX();
             moveTank.y = player.getY();
+            moveTank.rotation = player.getRotation();
             client.sendTCP(moveTank);
         }
     }

@@ -5,6 +5,7 @@ package com.speane.game.transfers;
  */
 public class CreatePlayer {
     public int id;
-    public int x;
-    public int y;
+    public float x;
+    public float y;
+    public float rotation;
 }

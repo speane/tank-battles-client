@@ -1,13 +1,17 @@
 package com.speane.game.entities;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import java.util.ArrayList;
 
 /**
  * Created by Speane on 08.03.2016.
  */
 public class Tank {
-    private int x;
-    private int y;
+    private float x;
+    private float y;
+    private float rotation;
+    private final float speed = 2.f;
 
     public ArrayList<Bullet> getBullets() {
         return bullets;
@@ -20,33 +24,53 @@ public class Tank {
         bullets.add(bullet);
     }
 
-    public Tank(int x, int y) {
+    public Tank(float x, float y, float rotation) {
         bullets = new ArrayList<Bullet>();
         this.x = x;
         this.y = y;
+        this.rotation = rotation;
     }
 
-    public int getY() {
+    public float getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
+    public void rotate(float delta) {
+        this.rotation += delta;
+        if (rotation > 360) {
+            rotation = rotation - 360;
+        }
+        else if (rotation < 0) {
+            rotation = rotation + 360;
+        }
+    }
+
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public void moveX(int dX) {
-        this.x += dX;
+    public void moveBackward() {
+        this.x -= speed * MathUtils.sinDeg(rotation);
+        this.y += speed * MathUtils.cosDeg(rotation);
     }
-
-    public void moveY(int dY) {
-        this.y += dY;
+    public void moveForward() {
+        this.x += speed * MathUtils.sinDeg(rotation);
+        this.y -= speed * MathUtils.cosDeg(rotation);
     }
 }

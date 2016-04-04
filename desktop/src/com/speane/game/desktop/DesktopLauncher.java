@@ -9,9 +9,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = Settings.DESKTOP_SCREEN_WIDTH;
-		config.height = Settings.DESCTOP_SCREEN_HEIGHT;
-		Settings.PORT = Integer.parseInt(arg[Settings.PORT_INDEX]);
-		Settings.SERVER_IP = arg[Settings.SERVER_IP_INDEX];
+		config.height = Settings.DESKTOP_SCREEN_HEIGHT;
 		new LwjglApplication(new TankGame(), config);
 	}
 }
