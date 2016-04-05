@@ -7,24 +7,27 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Bullet;
+import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
+import com.speane.game.help.Settings;
 import com.speane.game.transfers.CreatePlayer;
+import com.speane.game.transfers.DeadTank;
 import com.speane.game.transfers.MoveTank;
 import com.speane.game.transfers.ShootTank;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
 import static com.speane.game.help.Settings.*;
-import static com.speane.game.help.Messages.*;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -32,11 +35,12 @@ import static com.speane.game.help.Messages.*;
 public class GameScreen extends ScreenAdapter {
     private Tank player;
 
+
     private SpriteBatch batch;
     private Texture tankTexture;
     private Texture enemyTexture;
     private Texture bulletTexture;
-    private Touchpad touchpad;
+    private Texture deadTankTexture;
 
     private Client client;
 
@@ -47,7 +51,6 @@ public class GameScreen extends ScreenAdapter {
         loadResources();
         initEntities();
         initNetwork();
-        touchpad = new Touchpad(0, new Touchpad.TouchpadStyle());
     }
 
     @Override
@@ -66,9 +69,36 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateTankBullets(Tank tank) {
-        for (Bullet bullet : tank.getBullets()) {
-            bullet.moveY(3);
+        Iterator<Bullet> iterator = tank.getBullets().iterator();
+        Bullet bullet;
+        while (iterator.hasNext()) {
+            bullet = iterator.next();
+            bullet.move();
+            if (isOutOfScreen(bullet.getX(), bullet.getY())) {
+                iterator.remove();
+            }
+            else if ((tank != player) && isHit(bullet.getX(), bullet.getY())) {
+                iterator.remove();
+                player.setState(State.DEAD);
+                DeadTank deadTank = new DeadTank();
+                deadTank.bulletNumber = tank.getBullets().indexOf(bullet);
+                deadTank.killerID = tank.ID;
+                System.out.println("Killer: " + deadTank.killerID);
+                client.sendTCP(deadTank);
+            }
         }
+    }
+
+    private boolean isHit(float x, float y) {
+        return ((x > player.getX()) && (x < player.getX() + tankTexture.getWidth())
+                && (y > player.getY() && (y < player.getY() + tankTexture.getHeight())));
+    }
+
+    private boolean isOutOfScreen(float x, float y) {
+        return ((x > Settings.DESKTOP_SCREEN_WIDTH)
+                || (x < 0)
+                || (y > Settings.DESKTOP_SCREEN_HEIGHT)
+                || (y < 0));
     }
 
     private void initNetwork() {
@@ -88,6 +118,7 @@ public class GameScreen extends ScreenAdapter {
         kryo.register(MoveTank.class);
         kryo.register(CreatePlayer.class);
         kryo.register(ShootTank.class);
+        kryo.register(DeadTank.class);
     }
 
     private void initNetworkListener() {
@@ -101,15 +132,23 @@ public class GameScreen extends ScreenAdapter {
                     enemy.setY(moveTank.y);
                     enemy.setRotation(moveTank.rotation);
                 }
-                if (o instanceof CreatePlayer) {
+                else if (o instanceof CreatePlayer) {
                     CreatePlayer newPlayer = (CreatePlayer) o;
-                    enemies.put(newPlayer.id, new Tank(newPlayer.x, newPlayer.y, newPlayer.rotation));
+                    Tank newTank = new Tank(newPlayer.x, newPlayer.y, newPlayer.rotation);
+                    newTank.ID = newPlayer.id;
+                    enemies.put(newPlayer.id, newTank);
                 }
-                if (o instanceof ShootTank) {
+                else if (o instanceof ShootTank) {
                     ShootTank shootTank = (ShootTank) o;
                     Tank tank = enemies.get(shootTank.id);
-                    tank.shoot();
+                    tank.shoot(new Bullet(shootTank.x, shootTank.y, shootTank.rotation));
                     System.out.println("Shoot " + ((ShootTank) o).id);
+                }
+                else if (o instanceof DeadTank) {
+                    DeadTank deadTank = (DeadTank) o;
+                    System.out.println("Killer: " + deadTank.killerID);
+                    //enemies.get(deadTank.killerID).getBullets().remove(deadTank.bulletNumber);
+                    enemies.get(deadTank.id).setState(State.DEAD);
                 }
             }
         };
@@ -136,21 +175,31 @@ public class GameScreen extends ScreenAdapter {
         tankTexture = new Texture("tank.png");
         enemyTexture = new Texture("enemy.png");
         bulletTexture = new Texture("bullet.png");
+        deadTankTexture = new Texture("deadtank.png");
     }
 
     private void draw() {
         batch.begin();
 
         drawEnemies();
-        drawTank(player);
-        touchpad.draw(batch, 12);
+        if (player.getState() == State.ALIVE) {
+            drawTank(player);
+        }
+        else {
+            drawDeadTank(player);
+        }
 
         batch.end();
     }
 
     private void drawEnemies() {
         for (Tank enemy : enemies.values()) {
-            drawEnemyTank(enemy);
+            if (enemy.getState() == State.ALIVE) {
+                drawEnemyTank(enemy);
+            }
+            else {
+                drawDeadTank(enemy);
+            }
         }
     }
 
@@ -178,7 +227,24 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawBullets(ArrayList<Bullet> bullets) {
         for (Bullet bullet : bullets) {
-            batch.draw(bulletTexture, bullet.getX(), bullet.getY());
+            batch.draw(
+                    bulletTexture,
+                    bullet.getX(),
+                    bullet.getY(),
+                    bulletTexture.getWidth() / 2,
+                    bulletTexture.getHeight() / 2,
+                    bulletTexture.getWidth(),
+                    bulletTexture.getHeight(),
+                    1,
+                    1,
+                    bullet.getRotation(),
+                    0,
+                    0,
+                    bulletTexture.getWidth(),
+                    bulletTexture.getHeight(),
+                    false,
+                    false
+            );
         }
     }
 
@@ -204,6 +270,28 @@ public class GameScreen extends ScreenAdapter {
         );
     }
 
+    private void drawDeadTank(Tank tank) {
+        drawBullets(tank.getBullets());
+        batch.draw(
+                deadTankTexture,
+                tank.getX(),
+                tank.getY(),
+                deadTankTexture.getWidth() / 2,
+                deadTankTexture.getHeight() / 2,
+                deadTankTexture.getWidth(),
+                deadTankTexture.getHeight(),
+                1,
+                1,
+                tank.getRotation(),
+                0,
+                0,
+                deadTankTexture.getWidth(),
+                deadTankTexture.getHeight(),
+                false,
+                false
+        );
+    }
+
     private void clearScreen() {
         Gdx.gl.glClearColor(0.75f, 0.9f, 0.8f, Color.BLACK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -219,17 +307,17 @@ public class GameScreen extends ScreenAdapter {
         boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
 
         if (lPressed) {
-            player.rotate(1);
+            player.rotateLeft();
             moved = true;
             System.out.println(player.getRotation());
         }
         if (rPressed) {
-            player.rotate(-1);
+            player.rotateRight();
             moved = true;
             System.out.println(player.getRotation());
         }
         if (uPressed) {
-            player.moveForward(2);
+            player.moveForward();
             moved = true;
         }
         if (dPressed) {
@@ -238,8 +326,11 @@ public class GameScreen extends ScreenAdapter {
         }
 
         if (spacePressed) {
-            player.shoot();
+            Bullet bullet = player.shoot();
             ShootTank shootTank = new ShootTank();
+            shootTank.rotation = bullet.getRotation();
+            shootTank.x = bullet.getX();
+            shootTank.y = bullet.getY();
             client.sendTCP(shootTank);
         }
 

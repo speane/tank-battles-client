@@ -8,10 +8,15 @@ import java.util.ArrayList;
  * Created by Speane on 08.03.2016.
  */
 public class Tank {
+    public int ID;
+
+    private State state;
+
     private float x;
     private float y;
     private float rotation;
-    private final float speed = 2.f;
+    private float speed = 2.f;
+    private float rotationSpeed = 1.f;
 
     public ArrayList<Bullet> getBullets() {
         return bullets;
@@ -19,9 +24,19 @@ public class Tank {
 
     private ArrayList<Bullet> bullets;
 
-    public void shoot() {
-        Bullet bullet = new Bullet((x + 35), y + 100);
+    public Bullet shoot() {
+        Bullet bullet = new Bullet(
+                x + 35 - 50 * MathUtils.sinDeg(rotation),
+                y + 40 + 50 * MathUtils.cosDeg(rotation),
+                rotation
+        );
         bullets.add(bullet);
+        return bullet;
+    }
+
+    public Bullet shoot(Bullet bullet) {
+        bullets.add(bullet);
+        return bullet;
     }
 
     public Tank(float x, float y, float rotation) {
@@ -29,6 +44,7 @@ public class Tank {
         this.x = x;
         this.y = y;
         this.rotation = rotation;
+        state = State.ALIVE;
     }
 
     public float getRotation() {
@@ -39,12 +55,16 @@ public class Tank {
         this.rotation = rotation;
     }
 
-    public void rotate(float delta) {
-        this.rotation += delta;
+    public void rotateLeft() {
+        this.rotation += rotationSpeed;
         if (rotation > 360) {
             rotation = rotation - 360;
         }
-        else if (rotation < 0) {
+    }
+
+    public void rotateRight() {
+        this.rotation -= rotationSpeed;
+        if (rotation < 0) {
             rotation = rotation + 360;
         }
     }
@@ -66,11 +86,19 @@ public class Tank {
     }
 
     public void moveBackward() {
+        this.x += speed * MathUtils.sinDeg(rotation);
+        this.y -= speed * MathUtils.cosDeg(rotation);
+    }
+    public void moveForward() {
         this.x -= speed * MathUtils.sinDeg(rotation);
         this.y += speed * MathUtils.cosDeg(rotation);
     }
-    public void moveForward() {
-        this.x += speed * MathUtils.sinDeg(rotation);
-        this.y -= speed * MathUtils.cosDeg(rotation);
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 }

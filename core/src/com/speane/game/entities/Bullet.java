@@ -1,12 +1,18 @@
 package com.speane.game.entities;
 
+import com.badlogic.gdx.math.MathUtils;
+
 /**
  * Created by Speane on 10.03.2016.
  */
 public class Bullet {
-    public Bullet(float x, float y) {
+    private float rotation;
+    private float bulletSpeed = 3.f;
+
+    public Bullet(float x, float y, float rotation) {
         this.x = x;
         this.y = y;
+        this.rotation = rotation;
     }
 
     public float getX() {
@@ -20,10 +26,12 @@ public class Bullet {
     }
 
     private float y;
-    public void moveX(int dX) {
-        x += dX;
+    public void move() {
+        this.x -= bulletSpeed * MathUtils.sinDeg(rotation);
+        this.y += bulletSpeed * MathUtils.cosDeg(rotation);
     }
-    public void moveY(int dY) {
-        y += dY;
+
+    public float getRotation() {
+        return rotation;
     }
 }
