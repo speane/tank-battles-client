@@ -11,7 +11,8 @@ import java.util.ArrayList;
  */
 public class Tank extends MovingObject {
     public int ID;
-
+    private int lives;
+    private int score;
     private ArrayList<Bullet> bullets;
 
     private State state;
@@ -23,7 +24,7 @@ public class Tank extends MovingObject {
         this.height = Resourses.tankTexture.getHeight();
 
         bullets = new ArrayList<Bullet>();
-
+        lives = 3;
         state = State.ALIVE;
 
         rotateSpeed = 2.5f;
@@ -57,5 +58,24 @@ public class Tank extends MovingObject {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public void hit() {
+        lives--;
+        if (lives <= 0) {
+            state = State.DEAD;
+        }
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void addScore(int points) {
+        score += points;
     }
 }

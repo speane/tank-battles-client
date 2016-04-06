@@ -1,5 +1,6 @@
 package com.speane.game.help;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -16,7 +17,12 @@ public class Renderer {
     public Renderer(Batch batch) {
         this.batch = batch;
         font = new BitmapFont();
+        font.setColor(Color.RED);
         font.getData().scale(2);
+    }
+
+    public void drawText(String text, int x, int y) {
+        font.draw(batch, text, x, y);
     }
 
     public void draw(MovingObject entity, Texture texture) {

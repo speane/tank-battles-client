@@ -2,7 +2,6 @@ package com.speane.game.help;
 
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.GameObject;
-import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
 
 import java.util.Iterator;
@@ -28,14 +27,14 @@ public class CollisionDetector {
                 for (Tank secondEnemy : enemies.values()) {
                     if (firstEnemy.ID != secondEnemy.ID && isCollision(bullet, secondEnemy)) {
                         iterator.remove();
-                        secondEnemy.setState(State.DEAD);
+                        secondEnemy.hit();
                         Resourses.hitSound.play();
                     }
                 }
 
                 if (isCollision(bullet, player)) {
                     iterator.remove();
-                    player.setState(State.DEAD);
+                    player.hit();
                     Resourses.hitSound.play();
                 }
             }
@@ -44,7 +43,8 @@ public class CollisionDetector {
                 Bullet bullet = iterator.next();
                 if (isCollision(bullet, firstEnemy)) {
                     iterator.remove();
-                    firstEnemy.setState(State.DEAD);
+                    firstEnemy.hit();
+                    player.addScore(200);
                     Resourses.hitSound.play();
                 }
             }

@@ -103,9 +103,9 @@ public class GameScreen extends ScreenAdapter {
         }
         else {
             drawTank(player, Resourses.deadTankTexture);
-            renderer.showMessage("GAME OVER");
+            renderer.showMessage("GAME OVER " + player.getScore());
         }
-
+        renderer.drawText("Lives: " + player.getLives(), 0, Settings.DESKTOP_SCREEN_HEIGHT);
         batch.end();
     }
 
