@@ -14,14 +14,16 @@ import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
+import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.Settings;
+import com.speane.game.rendering.Renderer;
+import com.speane.game.resourses.Resourses;
 import com.speane.game.transfers.CreatePlayer;
 import com.speane.game.transfers.DeadTank;
 import com.speane.game.transfers.MoveTank;
 import com.speane.game.transfers.ShootTank;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,16 +36,9 @@ import static com.speane.game.help.Settings.*;
  */
 public class GameScreen extends ScreenAdapter {
     private Tank player;
-
-
     private SpriteBatch batch;
-    private Texture tankTexture;
-    private Texture enemyTexture;
-    private Texture bulletTexture;
-    private Texture deadTankTexture;
-
+    private Renderer renderer;
     private Client client;
-
     private Map<Integer, Tank> enemies;
 
     @Override
@@ -53,52 +48,22 @@ public class GameScreen extends ScreenAdapter {
         initNetwork();
     }
 
-    @Override
-    public void render(float delta) {
-        queryInput();
-        updateAllBullets();
-        clearScreen();
-        draw();
+    private void initEntities() {
+        initTanks();
     }
 
-    private void updateAllBullets() {
-        updateTankBullets(player);
-        for (Tank enemy : enemies.values()) {
-            updateTankBullets(enemy);
-        }
+    private void initTanks() {
+        player = new Tank(0, 0, 0);
+        enemies = new HashMap<Integer, Tank>();
     }
 
-    private void updateTankBullets(Tank tank) {
-        Iterator<Bullet> iterator = tank.getBullets().iterator();
-        Bullet bullet;
-        while (iterator.hasNext()) {
-            bullet = iterator.next();
-            bullet.move();
-            if (isOutOfScreen(bullet.getX(), bullet.getY())) {
-                iterator.remove();
-            }
-            else if ((tank != player) && isHit(bullet.getX(), bullet.getY())) {
-                iterator.remove();
-                player.setState(State.DEAD);
-                DeadTank deadTank = new DeadTank();
-                deadTank.bulletNumber = tank.getBullets().indexOf(bullet);
-                deadTank.killerID = tank.ID;
-                System.out.println("Killer: " + deadTank.killerID);
-                client.sendTCP(deadTank);
-            }
-        }
-    }
-
-    private boolean isHit(float x, float y) {
-        return ((x > player.getX()) && (x < player.getX() + tankTexture.getWidth())
-                && (y > player.getY() && (y < player.getY() + tankTexture.getHeight())));
-    }
-
-    private boolean isOutOfScreen(float x, float y) {
-        return ((x > Settings.DESKTOP_SCREEN_WIDTH)
-                || (x < 0)
-                || (y > Settings.DESKTOP_SCREEN_HEIGHT)
-                || (y < 0));
+    private void loadResources() {
+        batch = new SpriteBatch();
+        Resourses.tankTexture = new Texture("tank.png");
+        Resourses.enemyTankTexture = new Texture("enemy.png");
+        Resourses.bulletTextTexture = new Texture("bullet.png");
+        Resourses.deadTankTexture = new Texture("deadtank.png");
+        renderer = new Renderer(batch);
     }
 
     private void initNetwork() {
@@ -128,8 +93,7 @@ public class GameScreen extends ScreenAdapter {
                 if (o instanceof MoveTank) {
                     MoveTank moveTank = (MoveTank) o;
                     Tank enemy = enemies.get(moveTank.id);
-                    enemy.setX(moveTank.x);
-                    enemy.setY(moveTank.y);
+                    enemy.setPosition(moveTank.x, moveTank.y);
                     enemy.setRotation(moveTank.rotation);
                 }
                 else if (o instanceof CreatePlayer) {
@@ -147,7 +111,6 @@ public class GameScreen extends ScreenAdapter {
                 else if (o instanceof DeadTank) {
                     DeadTank deadTank = (DeadTank) o;
                     System.out.println("Killer: " + deadTank.killerID);
-                    //enemies.get(deadTank.killerID).getBullets().remove(deadTank.bulletNumber);
                     enemies.get(deadTank.id).setState(State.DEAD);
                 }
             }
@@ -161,140 +124,12 @@ public class GameScreen extends ScreenAdapter {
         });
     }
 
-    private void initEntities() {
-        initTanks();
-    }
-
-    private void initTanks() {
-        player = new Tank(0, 0, 0);
-        enemies = new HashMap<Integer, Tank>();
-    }
-
-    private void loadResources() {
-        batch = new SpriteBatch();
-        tankTexture = new Texture("tank.png");
-        enemyTexture = new Texture("enemy.png");
-        bulletTexture = new Texture("bullet.png");
-        deadTankTexture = new Texture("deadtank.png");
-    }
-
-    private void draw() {
-        batch.begin();
-
-        drawEnemies();
-        if (player.getState() == State.ALIVE) {
-            drawTank(player);
-        }
-        else {
-            drawDeadTank(player);
-        }
-
-        batch.end();
-    }
-
-    private void drawEnemies() {
-        for (Tank enemy : enemies.values()) {
-            if (enemy.getState() == State.ALIVE) {
-                drawEnemyTank(enemy);
-            }
-            else {
-                drawDeadTank(enemy);
-            }
-        }
-    }
-
-    private void drawTank(Tank tank) {
-        drawBullets(tank.getBullets());
-        batch.draw(
-                tankTexture,
-                tank.getX(),
-                tank.getY(),
-                tankTexture.getWidth() / 2,
-                tankTexture.getHeight() / 2,
-                tankTexture.getWidth(),
-                tankTexture.getHeight(),
-                1,
-                1,
-                tank.getRotation(),
-                0,
-                0,
-                tankTexture.getWidth(),
-                tankTexture.getHeight(),
-                false,
-                false
-        );
-    }
-
-    private void drawBullets(ArrayList<Bullet> bullets) {
-        for (Bullet bullet : bullets) {
-            batch.draw(
-                    bulletTexture,
-                    bullet.getX(),
-                    bullet.getY(),
-                    bulletTexture.getWidth() / 2,
-                    bulletTexture.getHeight() / 2,
-                    bulletTexture.getWidth(),
-                    bulletTexture.getHeight(),
-                    1,
-                    1,
-                    bullet.getRotation(),
-                    0,
-                    0,
-                    bulletTexture.getWidth(),
-                    bulletTexture.getHeight(),
-                    false,
-                    false
-            );
-        }
-    }
-
-    private void drawEnemyTank(Tank tank) {
-        drawBullets(tank.getBullets());
-        batch.draw(
-                enemyTexture,
-                tank.getX(),
-                tank.getY(),
-                enemyTexture.getWidth() / 2,
-                enemyTexture.getHeight() / 2,
-                enemyTexture.getWidth(),
-                enemyTexture.getHeight(),
-                1,
-                1,
-                tank.getRotation(),
-                0,
-                0,
-                enemyTexture.getWidth(),
-                enemyTexture.getHeight(),
-                false,
-                false
-        );
-    }
-
-    private void drawDeadTank(Tank tank) {
-        drawBullets(tank.getBullets());
-        batch.draw(
-                deadTankTexture,
-                tank.getX(),
-                tank.getY(),
-                deadTankTexture.getWidth() / 2,
-                deadTankTexture.getHeight() / 2,
-                deadTankTexture.getWidth(),
-                deadTankTexture.getHeight(),
-                1,
-                1,
-                tank.getRotation(),
-                0,
-                0,
-                deadTankTexture.getWidth(),
-                deadTankTexture.getHeight(),
-                false,
-                false
-        );
-    }
-
-    private void clearScreen() {
-        Gdx.gl.glClearColor(0.75f, 0.9f, 0.8f, Color.BLACK.a);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    @Override
+    public void render(float delta) {
+        queryInput();
+        updateAllBullets();
+        clearScreen();
+        draw();
     }
 
     private void queryInput() {
@@ -307,21 +142,19 @@ public class GameScreen extends ScreenAdapter {
         boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
 
         if (lPressed) {
-            player.rotateLeft();
+            player.rotate(Direction.LEFT);
             moved = true;
-            System.out.println(player.getRotation());
         }
         if (rPressed) {
-            player.rotateRight();
+            player.rotate(Direction.RIGHT);
             moved = true;
-            System.out.println(player.getRotation());
         }
         if (uPressed) {
-            player.moveForward();
+            player.move(Direction.FORWARD);
             moved = true;
         }
         if (dPressed) {
-            player.moveBackward();
+            player.move(Direction.BACKWARD);
             moved = true;
         }
 
@@ -329,17 +162,97 @@ public class GameScreen extends ScreenAdapter {
             Bullet bullet = player.shoot();
             ShootTank shootTank = new ShootTank();
             shootTank.rotation = bullet.getRotation();
-            shootTank.x = bullet.getX();
-            shootTank.y = bullet.getY();
+            shootTank.x = bullet.getPosition().x;
+            shootTank.y = bullet.getPosition().y;
             client.sendTCP(shootTank);
         }
 
         if (moved) {
             MoveTank moveTank = new MoveTank();
-            moveTank.x = player.getX();
-            moveTank.y = player.getY();
+            moveTank.x = player.getPosition().x;
+            moveTank.y = player.getPosition().y;
             moveTank.rotation = player.getRotation();
             client.sendTCP(moveTank);
         }
+    }
+
+    private void updateAllBullets() {
+        updateTankBullets(player);
+        for (Tank enemy : enemies.values()) {
+            updateTankBullets(enemy);
+        }
+    }
+
+    private void updateTankBullets(Tank tank) {
+        Iterator<Bullet> iterator = tank.getBullets().iterator();
+        Bullet bullet;
+        while (iterator.hasNext()) {
+            bullet = iterator.next();
+            bullet.move(Direction.FORWARD);
+            if (isOutOfScreen(bullet.getPosition().x, bullet.getPosition().y)) {
+                iterator.remove();
+            }
+            /*else if ((tank != player) && isHit(bullet.getPosition().x, bullet.getPosition().y)) {
+                iterator.remove();
+                player.setState(State.DEAD);
+                DeadTank deadTank = new DeadTank();
+                deadTank.bulletNumber = tank.getBullets().indexOf(bullet);
+                deadTank.killerID = tank.ID;
+                System.out.println("Killer: " + deadTank.killerID);
+                client.sendTCP(deadTank);
+            }*/
+        }
+    }
+
+    /*private boolean isHit(float x, float y) {
+        return ((x > player.getX()) && (x < player.getX() + tankTexture.getWidth())
+                && (y > player.getY() && (y < player.getY() + tankTexture.getHeight())));
+    }*/
+
+    private boolean isOutOfScreen(float x, float y) {
+        return ((x > Settings.DESKTOP_SCREEN_WIDTH)
+                || (x < 0)
+                || (y > Settings.DESKTOP_SCREEN_HEIGHT)
+                || (y < 0));
+    }
+
+
+    private void draw() {
+        batch.begin();
+
+        drawEnemies();
+        if (player.getState() == State.ALIVE) {
+            //drawTank(player);
+            drawTank(player, Resourses.tankTexture);
+        }
+        else {
+            //drawDeadTank(player);
+            drawTank(player, Resourses.deadTankTexture);
+        }
+
+        batch.end();
+    }
+
+    private void drawTank(Tank tank, Texture texture) {
+        renderer.draw(tank, texture);
+        for (Bullet bullet : tank.getBullets()) {
+            renderer.draw(bullet, Resourses.bulletTextTexture);
+        }
+    }
+
+    private void drawEnemies() {
+        for (Tank enemy : enemies.values()) {
+            if (enemy.getState() == State.ALIVE) {
+                drawTank(enemy, Resourses.enemyTankTexture);
+            }
+            else {
+                drawTank(enemy, Resourses.deadTankTexture);
+            }
+        }
+    }
+
+    private void clearScreen() {
+        Gdx.gl.glClearColor(0.75f, 0.9f, 0.8f, Color.BLACK.a);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 }
