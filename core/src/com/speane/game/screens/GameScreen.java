@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.*;
+import com.speane.game.transfers.MoveTank;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,13 +48,20 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initTanks() {
-        player = new Tank(0, 0, 0);
+        player = new Tank(MathUtils.random(Settings.DESKTOP_SCREEN_WIDTH),
+                MathUtils.random(Settings.DESKTOP_SCREEN_HEIGHT),
+                MathUtils.random(360));
         enemies = new HashMap<Integer, Tank>();
     }
 
     private void loadResources() {
         batch = new SpriteBatch();
         renderer = new Renderer(batch);
+        MoveTank moveTank = new MoveTank();
+        moveTank.rotation = player.getRotation();
+        moveTank.x = player.getPosition().x;
+        moveTank.y = player.getPosition().y;
+        networker.move(moveTank);
         inputHandler = new InputHandler(player, networker);
         collisionDetector = new CollisionDetector(enemies, player);
     }
@@ -106,6 +115,7 @@ public class GameScreen extends ScreenAdapter {
             renderer.showMessage("GAME OVER " + player.getScore());
         }
         renderer.drawText("Lives: " + player.getLives(), 0, Settings.DESKTOP_SCREEN_HEIGHT);
+        renderer.drawText("Score: " + player.getScore(), 0, Settings.DESKTOP_SCREEN_HEIGHT - 50);
         batch.end();
     }
 
