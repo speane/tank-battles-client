@@ -2,6 +2,7 @@ package com.speane.game.entities;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.speane.game.help.Resourses;
 
 import java.util.ArrayList;
 
@@ -18,6 +19,8 @@ public class Tank extends MovingObject {
     public Tank(float x, float y, float rotation) {
         this.position = new Vector2(x, y);
         this.rotation = rotation;
+        this.width = Resourses.tankTexture.getWidth();
+        this.height = Resourses.tankTexture.getHeight();
 
         bullets = new ArrayList<Bullet>();
 
