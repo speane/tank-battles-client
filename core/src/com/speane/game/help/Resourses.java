@@ -28,8 +28,8 @@ public class Resourses {
         enemyTankTexture = new Texture("enemy.png");
         bulletTextTexture = new Texture("bullet.png");
         deadTankTexture = new Texture("deadtank.png");
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background.mp3"));
-        hitSound = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
-        shootSound = Gdx.audio.newSound(Gdx.files.internal("blast.wav"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/background.mp3"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("sound/hit.wav"));
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("sound/blast.wav"));
     }
 }
