@@ -2,11 +2,11 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
@@ -22,6 +22,8 @@ import java.util.Map;
  * Created by Speane on 08.03.2016.
  */
 public class GameScreen extends ScreenAdapter {
+    private Camera camera;
+    private Viewport viewport;
     private Tank player;
     private SpriteBatch batch;
     private Renderer renderer;
@@ -29,14 +31,40 @@ public class GameScreen extends ScreenAdapter {
     private Networker networker;
     private InputHandler inputHandler;
     private CollisionDetector collisionDetector;
+    private String playerName;
+
+    public GameScreen(String playerName) {
+        if (!playerName.equals("")) {
+            this.playerName = playerName;
+        }
+        else {
+            this.playerName = "Unnamed";
+        }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height);
+    }
 
     @Override
     public void show() {
+
+        System.out.println(this.playerName);
+
         initEntities();
         initNetwork();
+        initCamera();
+        viewport = new FitViewport(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, camera);
         loadResources();
-        /*Resourses.backgroundMusic.setLooping(true);
-        Resourses.backgroundMusic.play();*/
+        Resourses.backgroundMusic.setLooping(true);
+        Resourses.backgroundMusic.play();
+    }
+
+    private void initCamera() {
+        camera = new OrthographicCamera();
+        camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+        camera.update();
     }
 
     private void initEntities() {
@@ -105,6 +133,9 @@ public class GameScreen extends ScreenAdapter {
     private void draw() {
         clearScreen();
         batch.begin();
+
+        batch.setProjectionMatrix(camera.projection);
+        batch.setTransformMatrix(camera.view);
 
         drawEnemies();
         if (player.getState() == State.ALIVE) {

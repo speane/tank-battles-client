@@ -16,8 +16,14 @@ public class Resourses {
     public static Music backgroundMusic;
     public static Sound hitSound;
     public static Sound shootSound;
+    public static Texture startScreenBackgroundTexture;
+    public static Texture playButtonTexture;
+    public static Texture playButtonPressedTexture;
 
     static {
+        startScreenBackgroundTexture = new Texture("start_screen_background_image.png");
+        playButtonTexture = new Texture("play_button.png");
+        playButtonPressedTexture = new Texture("play_button_pressed.png");
         tankTexture = new Texture("tank.png");
         enemyTankTexture = new Texture("enemy.png");
         bulletTextTexture = new Texture("bullet.png");
