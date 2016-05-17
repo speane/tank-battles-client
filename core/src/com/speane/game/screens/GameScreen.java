@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -25,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.speane.game.help.TextureManager.*;
+
 /**
  * Created by Speane on 08.03.2016.
  */
@@ -42,7 +43,6 @@ public class GameScreen extends ScreenAdapter {
     private TankGame game;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
-    private TextureManager textureManager;
 
     public GameScreen(TankGame game) {
         this.game = game;
@@ -56,8 +56,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        tiledMap = game.getAssetManager().get("tank_battles.tmx");
-        textureManager = new TextureManager((TextureAtlas)game.getAssetManager().get("tank_battles_assets.atlas"));
+        tiledMap = game.getAssetManager().get("tiledmaps/tank_battles.tmx");
         initEntities();
         initNetwork();
         initCamera();
@@ -151,10 +150,10 @@ public class GameScreen extends ScreenAdapter {
 
         drawEnemies();
         if (player.getState() == State.ALIVE) {
-            drawTank(player, textureManager.tankTexture);
+            drawTank(player, TANK_TEXTURE);
         }
         else {
-            drawTank(player, textureManager.deadTankTexture);
+            drawTank(player, DEAD_TANK_TEXTURE);
             renderer.showMessage("GAME OVER " + player.getScore());
         }
         renderer.drawText("Lives: " + player.getLives(), 0, Config.DESKTOP_SCREEN_HEIGHT);
@@ -165,17 +164,17 @@ public class GameScreen extends ScreenAdapter {
     private void drawTank(Tank tank, TextureRegion texture) {
         renderer.draw(tank, texture);
         for (Bullet bullet : tank.getBullets()) {
-            renderer.draw(bullet, textureManager.bulletTexture);
+            renderer.draw(bullet, BULLET_TEXTURE);
         }
     }
 
     private void drawEnemies() {
         for (Tank enemy : enemies.values()) {
             if (enemy.getState() == State.ALIVE) {
-                drawTank(enemy, textureManager.enemyTankTexture);
+                drawTank(enemy, ENEMY_TANK_TEXTURE);
             }
             else {
-                drawTank(enemy, textureManager.deadTankTexture);
+                drawTank(enemy, DEAD_TANK_TEXTURE);
             }
         }
     }

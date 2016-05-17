@@ -2,9 +2,10 @@ package com.speane.game.entities;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.speane.game.help.Resourses;
 
 import java.util.ArrayList;
+
+import static com.speane.game.help.TextureManager.TANK_TEXTURE;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -20,8 +21,8 @@ public class Tank extends MovingObject {
     public Tank(float x, float y, float rotation) {
         this.position = new Vector2(x, y);
         this.rotation = rotation;
-        this.width = Resourses.tankTexture.getWidth();
-        this.height = Resourses.tankTexture.getHeight();
+        this.width = TANK_TEXTURE.getRegionWidth();
+        this.height = TANK_TEXTURE.getRegionHeight();
 
         bullets = new ArrayList<Bullet>();
         lives = 3;

@@ -1,7 +1,8 @@
 package com.speane.game.entities;
 
 import com.badlogic.gdx.math.Vector2;
-import com.speane.game.help.Resourses;
+
+import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
 
 /**
  * Created by Speane on 10.03.2016.
@@ -13,7 +14,7 @@ public class Bullet extends MovingObject {
         this.rotation = rotation;
         this.rotateSpeed = 3.f;
         this.moveVector.rotate(rotation);
-        this.width = Resourses.bulletTextTexture.getWidth();
-        this.height = Resourses.bulletTextTexture.getHeight();
+        this.width = BULLET_TEXTURE.getRegionWidth();
+        this.height = BULLET_TEXTURE.getRegionHeight();
     }
 }

@@ -7,9 +7,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.speane.game.TankGame;
+import com.speane.game.help.TextureManager;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
@@ -42,8 +44,8 @@ public class LoadingScreen extends ScreenAdapter {
         camera.update();
         viewport = new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT, camera);
         shapeRenderer = new ShapeRenderer();
-        //game.getAssetManager().load("tank_battles.tmx", TiledMap.class);
         game.getAssetManager().load("textures/archive/tank_battles_assets.atlas", TextureAtlas.class);
+        game.getAssetManager().load("tiledmaps/tank_battles.tmx", TiledMap.class);
     }
 
     @Override
@@ -60,6 +62,8 @@ public class LoadingScreen extends ScreenAdapter {
 
     public void update() {
         if (game.getAssetManager().update()) {
+            TextureAtlas textureAtlas = game.getAssetManager().get("textures/archive/tank_battles_assets.atlas");
+            TextureManager.init(textureAtlas);
             game.setScreen(new StartScreen(game));
         } else {
             progress = game.getAssetManager().getProgress();

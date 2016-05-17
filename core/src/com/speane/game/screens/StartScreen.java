@@ -2,8 +2,6 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -15,10 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
-import com.speane.game.help.Resourses;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
+import static com.speane.game.help.TextureManager.*;
 
 /**
  * Created by Evgeny Shilov on 16.05.2016.
@@ -37,8 +35,7 @@ public class StartScreen extends ScreenAdapter {
 
         stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
         Gdx.input.setInputProcessor(stage);
-
-        Image backgroundImage = new Image(((TextureAtlas)game.getAssetManager().get("textures/archive/tank_battles_assets.atlas")).findRegion("start_screen_background_image"));
+        Image backgroundImage = new Image(START_MENU_BACKGROUND_TEXTURE);
         stage.addActor(backgroundImage);
 
         final TextField textField = new TextField("", skin);
@@ -47,8 +44,8 @@ public class StartScreen extends ScreenAdapter {
         stage.addActor(textField);
 
         ImageButton imageButton = new ImageButton(
-                new TextureRegionDrawable(new TextureRegion(Resourses.playButtonTexture)),
-                new TextureRegionDrawable(new TextureRegion(Resourses.playButtonPressedTexture)));
+                new TextureRegionDrawable(PLAY_BUTTON_TEXTURE),
+                new TextureRegionDrawable(PLAY_BUTTON_PRESSED_TEXTURE));
         imageButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
         imageButton.addListener(new ActorGestureListener() {
             @Override
