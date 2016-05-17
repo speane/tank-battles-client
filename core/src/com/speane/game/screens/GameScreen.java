@@ -109,6 +109,9 @@ public class GameScreen extends ScreenAdapter {
         }
         updateAllBullets();
         collisionDetector.checkCollisions();
+        camera.position.set(player.getPosition().x, player.getPosition().y, camera.position.z);
+        camera.update();
+        orthogonalTiledMapRenderer.setView(camera);
         draw();
     }
 
