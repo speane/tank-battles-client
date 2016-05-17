@@ -2,8 +2,14 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -23,7 +29,7 @@ import java.util.Map;
  * Created by Speane on 08.03.2016.
  */
 public class GameScreen extends ScreenAdapter {
-    private Camera camera;
+    private OrthographicCamera camera;
     private Viewport viewport;
     private Tank player;
     private SpriteBatch batch;
@@ -34,6 +40,9 @@ public class GameScreen extends ScreenAdapter {
     private CollisionDetector collisionDetector;
     private String playerName;
     private TankGame game;
+    private TiledMap tiledMap;
+    private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
+    private TextureManager textureManager;
 
     public GameScreen(TankGame game) {
         this.game = game;
@@ -47,19 +56,24 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
+        tiledMap = game.getAssetManager().get("tank_battles.tmx");
+        textureManager = new TextureManager((TextureAtlas)game.getAssetManager().get("tank_battles_assets.atlas"));
         initEntities();
         initNetwork();
         initCamera();
-        viewport = new FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera);
         loadResources();
+        orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
+        orthogonalTiledMapRenderer.setView(camera);
         Resourses.backgroundMusic.setLooping(true);
         Resourses.backgroundMusic.play();
     }
 
     private void initCamera() {
         camera = new OrthographicCamera();
-        camera.position.set(player.getPosition().x, player.getPosition().y, 0);
-        camera.update();
+        //camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+        //camera.update();
+        viewport = new FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera);
+        viewport.apply(true);
     }
 
     private void initEntities() {
@@ -126,18 +140,21 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
-        clearScreen();
-        batch.begin();
-
         batch.setProjectionMatrix(camera.projection);
         batch.setTransformMatrix(camera.view);
+        orthogonalTiledMapRenderer.render();
+
+        //clearScreen();
+        batch.begin();
+
+
 
         drawEnemies();
         if (player.getState() == State.ALIVE) {
-            drawTank(player, Resourses.tankTexture);
+            drawTank(player, textureManager.tankTexture);
         }
         else {
-            drawTank(player, Resourses.deadTankTexture);
+            drawTank(player, textureManager.deadTankTexture);
             renderer.showMessage("GAME OVER " + player.getScore());
         }
         renderer.drawText("Lives: " + player.getLives(), 0, Config.DESKTOP_SCREEN_HEIGHT);
@@ -145,20 +162,20 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
     }
 
-    private void drawTank(Tank tank, Texture texture) {
+    private void drawTank(Tank tank, TextureRegion texture) {
         renderer.draw(tank, texture);
         for (Bullet bullet : tank.getBullets()) {
-            renderer.draw(bullet, Resourses.bulletTextTexture);
+            renderer.draw(bullet, textureManager.bulletTexture);
         }
     }
 
     private void drawEnemies() {
         for (Tank enemy : enemies.values()) {
             if (enemy.getState() == State.ALIVE) {
-                drawTank(enemy, Resourses.enemyTankTexture);
+                drawTank(enemy, textureManager.enemyTankTexture);
             }
             else {
-                drawTank(enemy, Resourses.deadTankTexture);
+                drawTank(enemy, textureManager.deadTankTexture);
             }
         }
     }

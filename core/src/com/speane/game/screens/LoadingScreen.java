@@ -2,7 +2,10 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -39,6 +42,8 @@ public class LoadingScreen extends ScreenAdapter {
         camera.update();
         viewport = new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT, camera);
         shapeRenderer = new ShapeRenderer();
+        //game.getAssetManager().load("tank_battles.tmx", TiledMap.class);
+        game.getAssetManager().load("textures/archive/tank_battles_assets.atlas", TextureAtlas.class);
     }
 
     @Override
@@ -55,7 +60,7 @@ public class LoadingScreen extends ScreenAdapter {
 
     public void update() {
         if (game.getAssetManager().update()) {
-            game.setScreen(new GameScreen(game));
+            game.setScreen(new StartScreen(game));
         } else {
             progress = game.getAssetManager().getProgress();
         }

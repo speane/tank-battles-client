@@ -11,7 +11,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = Config.DESKTOP_SCREEN_WIDTH;
 		config.height = Config.DESKTOP_SCREEN_HEIGHT;
-		TexturePacker.process("../assets", "../assets", "tank_battles_assets");
+		TexturePacker.process("../assets/textures", "../assets/textures/archive", "tank_battles_assets");
 		new LwjglApplication(new TankGame(), config);
 	}
 }

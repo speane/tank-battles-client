@@ -1,9 +1,9 @@
 package com.speane.game.help;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.speane.game.entities.MovingObject;
 
@@ -25,7 +25,7 @@ public class Renderer {
         font.draw(batch, text, x, y);
     }
 
-    public void draw(MovingObject entity, Texture texture) {
+    public void draw(MovingObject entity, TextureRegion texture) {
         int width = entity.getWidth();
         int height = entity.getHeight();
         Vector2 coordinates = entity.getPosition();
@@ -40,13 +40,13 @@ public class Renderer {
                 height,
                 1,
                 1,
-                rotation,
+                rotation/*,
                 0,
                 0,
                 width,
                 height,
                 false,
-                false
+                false*/
         );
     }
 

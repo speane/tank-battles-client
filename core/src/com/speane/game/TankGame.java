@@ -2,7 +2,10 @@ package com.speane.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
-import com.speane.game.screens.StartScreen;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.speane.game.screens.LoadingScreen;
 
 public class TankGame extends Game {
 	private AssetManager assetManager = new AssetManager();
@@ -10,7 +13,8 @@ public class TankGame extends Game {
 
 	@Override
 	public void create() {
-		setScreen(new StartScreen(this));
+		assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+		setScreen(new LoadingScreen(this));
 	}
 
 	public AssetManager getAssetManager() {

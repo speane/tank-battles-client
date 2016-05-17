@@ -2,6 +2,7 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -37,7 +38,7 @@ public class StartScreen extends ScreenAdapter {
         stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
         Gdx.input.setInputProcessor(stage);
 
-        Image backgroundImage = new Image(Resourses.startScreenBackgroundTexture);
+        Image backgroundImage = new Image(((TextureAtlas)game.getAssetManager().get("textures/archive/tank_battles_assets.atlas")).findRegion("start_screen_background_image"));
         stage.addActor(backgroundImage);
 
         final TextField textField = new TextField("", skin);
@@ -54,7 +55,7 @@ public class StartScreen extends ScreenAdapter {
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 super.tap(event, x, y, count, button);
                 game.setPlayerName(textField.getText());
-                game.setScreen(new LoadingScreen(game));
+                game.setScreen(new GameScreen(game));
                 dispose();
             }
         });
