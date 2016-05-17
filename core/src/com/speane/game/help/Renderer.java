@@ -51,6 +51,6 @@ public class Renderer {
     }
 
     public void showMessage(String message) {
-        font.draw(batch, message, Settings.DESKTOP_SCREEN_WIDTH / 2 - 100, Settings.DESKTOP_SCREEN_HEIGHT / 2 + 100);
+        font.draw(batch, message, Config.DESKTOP_SCREEN_WIDTH / 2 - 100, Config.DESKTOP_SCREEN_HEIGHT / 2 + 100);
     }
 }

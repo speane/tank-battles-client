@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.speane.game.TankGame;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
@@ -32,14 +33,11 @@ public class GameScreen extends ScreenAdapter {
     private InputHandler inputHandler;
     private CollisionDetector collisionDetector;
     private String playerName;
+    private TankGame game;
 
-    public GameScreen(String playerName) {
-        if (!playerName.equals("")) {
-            this.playerName = playerName;
-        }
-        else {
-            this.playerName = "Unnamed";
-        }
+    public GameScreen(TankGame game) {
+        this.game = game;
+        playerName = game.getPlayerName();
     }
 
     @Override
@@ -49,13 +47,10 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-
-        System.out.println(this.playerName);
-
         initEntities();
         initNetwork();
         initCamera();
-        viewport = new FitViewport(Settings.WORLD_WIDTH, Settings.WORLD_HEIGHT, camera);
+        viewport = new FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera);
         loadResources();
         Resourses.backgroundMusic.setLooping(true);
         Resourses.backgroundMusic.play();
@@ -76,8 +71,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initTanks() {
-        player = new Tank(MathUtils.random(Settings.DESKTOP_SCREEN_WIDTH),
-                MathUtils.random(Settings.DESKTOP_SCREEN_HEIGHT),
+        player = new Tank(MathUtils.random(Config.DESKTOP_SCREEN_WIDTH),
+                MathUtils.random(Config.DESKTOP_SCREEN_HEIGHT),
                 MathUtils.random(360));
         enemies = new HashMap<Integer, Tank>();
     }
@@ -124,9 +119,9 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private boolean isOutOfScreen(float x, float y) {
-        return ((x > Settings.DESKTOP_SCREEN_WIDTH)
+        return ((x > Config.DESKTOP_SCREEN_WIDTH)
                 || (x < 0)
-                || (y > Settings.DESKTOP_SCREEN_HEIGHT)
+                || (y > Config.DESKTOP_SCREEN_HEIGHT)
                 || (y < 0));
     }
 
@@ -145,8 +140,8 @@ public class GameScreen extends ScreenAdapter {
             drawTank(player, Resourses.deadTankTexture);
             renderer.showMessage("GAME OVER " + player.getScore());
         }
-        renderer.drawText("Lives: " + player.getLives(), 0, Settings.DESKTOP_SCREEN_HEIGHT);
-        renderer.drawText("Score: " + player.getScore(), 0, Settings.DESKTOP_SCREEN_HEIGHT - 50);
+        renderer.drawText("Lives: " + player.getLives(), 0, Config.DESKTOP_SCREEN_HEIGHT);
+        renderer.drawText("Score: " + player.getScore(), 0, Config.DESKTOP_SCREEN_HEIGHT - 50);
         batch.end();
     }
 

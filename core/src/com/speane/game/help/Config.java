@@ -3,7 +3,7 @@ package com.speane.game.help;
 /**
  * Created by Speane on 12.03.2016.
  */
-public class Settings {
+public class Config {
     public static String SERVER_IP = "localhost";
     public static int PORT = 7777;
     public static int DESKTOP_SCREEN_WIDTH = 640;

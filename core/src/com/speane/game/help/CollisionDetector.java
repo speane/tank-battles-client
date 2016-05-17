@@ -54,9 +54,9 @@ public class CollisionDetector {
     public boolean isOutOfField(GameObject object) {
         float x = object.getPosition().x;
         float y = object.getPosition().y;
-        return  x > Settings.DESKTOP_SCREEN_WIDTH ||
+        return  x > Config.DESKTOP_SCREEN_WIDTH ||
                 x < 0 ||
-                y > Settings.DESKTOP_SCREEN_HEIGHT ||
+                y > Config.DESKTOP_SCREEN_HEIGHT ||
                 x < 0;
     }
 

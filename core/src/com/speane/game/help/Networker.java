@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
-import static com.speane.game.help.Settings.*;
+import static com.speane.game.help.Config.*;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.

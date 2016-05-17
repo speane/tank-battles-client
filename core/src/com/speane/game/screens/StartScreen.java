@@ -1,6 +1,5 @@
 package com.speane.game.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,19 +13,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.speane.game.TankGame;
 import com.speane.game.help.Resourses;
 
-import static com.speane.game.help.Settings.DESKTOP_SCREEN_HEIGHT;
-import static com.speane.game.help.Settings.DESKTOP_SCREEN_WIDTH;
+import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
+import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
 
 /**
  * Created by Evgeny Shilov on 16.05.2016.
  */
 public class StartScreen extends ScreenAdapter {
     private Stage stage;
-    private Game game;
+    private TankGame game;
 
-    public StartScreen(Game game) {
+    public StartScreen(TankGame game) {
         this.game = game;
     }
 
@@ -53,7 +53,8 @@ public class StartScreen extends ScreenAdapter {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 super.tap(event, x, y, count, button);
-                game.setScreen(new GameScreen(textField.getText()));
+                game.setPlayerName(textField.getText());
+                game.setScreen(new LoadingScreen(game));
                 dispose();
             }
         });
