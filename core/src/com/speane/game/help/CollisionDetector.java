@@ -77,35 +77,6 @@ public class CollisionDetector {
                 }
             }
         }
-        /*for (Tank firstEnemy : enemies.values()) {
-            Iterator<Bullet> iterator = firstEnemy.getBullets().iterator();
-            while (iterator.hasNext()) {
-                Bullet bullet = iterator.next();
-                for (Tank secondEnemy : enemies.values()) {
-                    if (firstEnemy.ID != secondEnemy.ID && isCollision(bullet, secondEnemy)) {
-                        iterator.remove();
-                        secondEnemy.hit();
-                        Resourses.hitSound.play();
-                    }
-                }
-
-                if (isCollision(bullet, player)) {
-                    iterator.remove();
-                    //player.hit();
-                    Resourses.hitSound.play();
-                }
-            }
-            iterator = player.getBullets().iterator();
-            while (iterator.hasNext()) {
-                Bullet bullet = iterator.next();
-                if (isCollision(bullet, firstEnemy)) {
-                    iterator.remove();
-                    //firstEnemy.hit();
-                    //player.addScore(200);
-                    Resourses.hitSound.play();
-                }
-            }
-        }*/
     }
 
     public boolean isOutOfField(GameObject object) {

@@ -36,6 +36,7 @@ public class StartScreen extends ScreenAdapter {
         stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
         Gdx.input.setInputProcessor(stage);
         Image backgroundImage = new Image(START_MENU_BACKGROUND_TEXTURE);
+        backgroundImage.setSize(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT);
         stage.addActor(backgroundImage);
 
         final TextField textField = new TextField("", skin);
@@ -43,9 +44,11 @@ public class StartScreen extends ScreenAdapter {
         textField.setMessageText("Enter your name");
         stage.addActor(textField);
 
-        ImageButton imageButton = new ImageButton(
-                new TextureRegionDrawable(PLAY_BUTTON_TEXTURE),
-                new TextureRegionDrawable(PLAY_BUTTON_PRESSED_TEXTURE));
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = new TextureRegionDrawable(PLAY_BUTTON_TEXTURE);
+        style.imageOver = new TextureRegionDrawable(PLAY_BUTTON_PRESSED_TEXTURE);
+
+        ImageButton imageButton = new ImageButton(style);
         imageButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
         imageButton.addListener(new ActorGestureListener() {
             @Override

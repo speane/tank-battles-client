@@ -67,14 +67,14 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void show() {
         tiledMap = game.getAssetManager().get("tiledmaps/tank_battles.tmx");
+        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer)tiledMap.getLayers().get("background");
+        levelWidth = tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
+        levelHeight = tiledMapTileLayer.getHeight() * tiledMapTileLayer.getTileHeight();
         score = new GameScore();
         initEntities();
         initNetwork();
         initCamera();
         loadResources();
-        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer)tiledMap.getLayers().get("background");
-        levelWidth = tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
-        levelHeight = tiledMapTileLayer.getHeight() * tiledMapTileLayer.getTileHeight();
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView(camera);
         Resourses.backgroundMusic.setLooping(true);
@@ -83,7 +83,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void initCamera() {
         camera = new OrthographicCamera();
-        viewport = new FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera);
+        viewport = new FitViewport(Config.DESKTOP_SCREEN_WIDTH, Config.DESKTOP_SCREEN_HEIGHT, camera);
         viewport.apply(true);
     }
 
@@ -96,9 +96,12 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initTanks() {
-        player = new Tank(TANK_TEXTURE, (MathUtils.random(Config.DESKTOP_SCREEN_WIDTH)),
-                MathUtils.random(Config.DESKTOP_SCREEN_HEIGHT),
-                MathUtils.random(360));
+        do {
+            player = new Tank(TANK_TEXTURE, (MathUtils.random((int) levelWidth)),
+                    MathUtils.random((int) levelHeight),
+                    MathUtils.random(360));
+        } while (CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("indestructible"),
+                player.getCollisionModel()));
         enemies = new HashMap<Integer, Tank>();
     }
 
@@ -122,12 +125,6 @@ public class GameScreen extends ScreenAdapter {
         updateAllBullets();
         collisionDetector.checkCollisions();
 
-        if (CollisionDetector.collidesWithLayer(
-                (TiledMapTileLayer)tiledMap.getLayers().get("indestructible"),
-                player.getCollisionModel())) {
-            System.out.println("COLLISION!!!");
-        }
-
         updateCamera();
         draw();
     }
@@ -145,7 +142,8 @@ public class GameScreen extends ScreenAdapter {
         while (iterator.hasNext()) {
             bullet = iterator.next();
             bullet.move(Direction.FORWARD);
-            if (isOutOfScreen(bullet.getX(), bullet.getY())) {
+            if (CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("indestructible"),
+                    bullet.getCollisionModel())) {
                 iterator.remove();
             }
         }
@@ -191,9 +189,12 @@ public class GameScreen extends ScreenAdapter {
 
         drawEnemies();
         drawTank(player, TANK_TEXTURE);
-        renderer.showMessage("GAME OVER " + score);
-        renderer.drawText("Health: " + player.getHealthPoints(), 0, Config.DESKTOP_SCREEN_HEIGHT);
-        renderer.drawText("Score: " + score, 0, Config.DESKTOP_SCREEN_HEIGHT - 50);
+        renderer.drawText("Health: " + player.getHealthPoints(),
+                (int) (camera.position.x - Config.DESKTOP_SCREEN_WIDTH / 2),
+                (int) (camera.position.y + Config.DESKTOP_SCREEN_HEIGHT / 2));
+        renderer.drawText("Score: " + score,
+                (int) (camera.position.x - Config.DESKTOP_SCREEN_WIDTH / 2),
+                (int) (camera.position.y + Config.DESKTOP_SCREEN_HEIGHT / 2 - 20));
         batch.end();
     }
 
