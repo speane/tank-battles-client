@@ -11,10 +11,12 @@ public abstract class GameObject {
     protected TextureRegion texture;
     protected Rectangle collisionModel;
     protected Vector2 position;
+    protected float rotation;
     protected float width;
     protected float height;
 
-    public GameObject(TextureRegion texture, float x, float y) {
+    public GameObject(TextureRegion texture, float x, float y, float rotation) {
+        this.rotation = rotation;
         this.texture = texture;
         position = new Vector2(x, y);
         collisionModel = new Rectangle(position.x, position.y, texture.getRegionWidth(), texture.getRegionHeight());
@@ -38,7 +40,7 @@ public abstract class GameObject {
         position.y = y;
     }
 
-    public void setPostion(float x, float y) {
+    public void setPosition(float x, float y) {
         position.x = x;
         position.y = y;
         updateCollisionModel();

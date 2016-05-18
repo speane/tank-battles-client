@@ -16,9 +16,9 @@ public class TextureManager {
     public static TextureRegion PLAY_BUTTON_PRESSED_TEXTURE;
 
     public static void init(TextureAtlas atlas) {
-        TANK_TEXTURE = atlas.findRegion("tank");
+        TANK_TEXTURE = atlas.findRegion("player_tank_body");
         DEAD_TANK_TEXTURE = atlas.findRegion("enemy");
-        ENEMY_TANK_TEXTURE = atlas.findRegion("deadtank");
+        ENEMY_TANK_TEXTURE = atlas.findRegion("enemy_tank_body");
         BULLET_TEXTURE = atlas.findRegion("bullet");
         PLAY_BUTTON_TEXTURE = atlas.findRegion("play_button");
         PLAY_BUTTON_PRESSED_TEXTURE = atlas.findRegion("play_button_pressed");

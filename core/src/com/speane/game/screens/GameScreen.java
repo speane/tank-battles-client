@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.speane.game.TankGame;
 import com.speane.game.entities.Bullet;
-import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.*;
@@ -27,12 +26,17 @@ import java.util.Map;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
-import static com.speane.game.help.TextureManager.*;
+import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
+import static com.speane.game.help.TextureManager.ENEMY_TANK_TEXTURE;
+import static com.speane.game.help.TextureManager.TANK_TEXTURE;
 
 /**
  * Created by Speane on 08.03.2016.
  */
 public class GameScreen extends ScreenAdapter {
+    private boolean gameOver = false;
+    private int score;
+
     private OrthographicCamera camera;
     private Viewport viewport;
     private Tank player;
@@ -112,7 +116,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        if (player.getState() == State.ALIVE) {
+        if (!gameOver) {
             inputHandler.queryInput();
         }
         updateAllBullets();
@@ -185,18 +189,11 @@ public class GameScreen extends ScreenAdapter {
         //clearScreen();
         batch.begin();
 
-
-
         drawEnemies();
-        if (player.getState() == State.ALIVE) {
-            drawTank(player, TANK_TEXTURE);
-        }
-        else {
-            drawTank(player, DEAD_TANK_TEXTURE);
-            renderer.showMessage("GAME OVER " + player.getScore());
-        }
-        renderer.drawText("Lives: " + player.getLives(), 0, Config.DESKTOP_SCREEN_HEIGHT);
-        renderer.drawText("Score: " + player.getScore(), 0, Config.DESKTOP_SCREEN_HEIGHT - 50);
+        drawTank(player, TANK_TEXTURE);
+        renderer.showMessage("GAME OVER " + score);
+        renderer.drawText("Health: " + player.getHealthPoints(), 0, Config.DESKTOP_SCREEN_HEIGHT);
+        renderer.drawText("Score: " + score, 0, Config.DESKTOP_SCREEN_HEIGHT - 50);
         batch.end();
     }
 
@@ -209,12 +206,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawEnemies() {
         for (Tank enemy : enemies.values()) {
-            if (enemy.getState() == State.ALIVE) {
-                drawTank(enemy, ENEMY_TANK_TEXTURE);
-            }
-            else {
-                drawTank(enemy, DEAD_TANK_TEXTURE);
-            }
+            drawTank(enemy, ENEMY_TANK_TEXTURE);
         }
     }
 

@@ -30,9 +30,6 @@ public class InputHandler {
         int oldX = tank.getX();
         int oldY = tank.getY();
 
-        Direction moveDirection = Direction.FORWARD;
-        Direction rotateDirection = Direction.LEFT;
-
         boolean lPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
         boolean uPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
@@ -59,7 +56,7 @@ public class InputHandler {
         if (moved) {
             if (CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get("indestructible"),
                     tank.getCollisionModel())) {
-                tank.setPostion(oldX, oldY);
+                tank.setPosition(oldX, oldY);
             }
         }
 

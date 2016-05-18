@@ -13,18 +13,18 @@ import static com.speane.game.help.TextureManager.*;
  */
 public class Tank extends MovingObject {
     public int ID;
-    private int lives;
-    private int score;
+    private int healthPoints;
+    private int level;
+    private int damage;
     private ArrayList<Bullet> bullets;
-
-    private State state;
 
     public Tank(TextureRegion texture, float x, float y, float rotation) {
         super(texture, x, y, rotation);
 
         bullets = new ArrayList<Bullet>();
-        lives = 3;
-        state = State.ALIVE;
+        healthPoints = 100;
+        damage = 20;
+        level = 1;
 
         rotateSpeed = 2.5f;
         moveVector = new Vector2(0, 3);
@@ -46,35 +46,20 @@ public class Tank extends MovingObject {
         return bullet;
     }
 
+    public void hit(Tank tank) {
+        tank.subHealthPoints(damage);
+    }
+
     public Bullet shoot(Bullet bullet) {
         bullets.add(bullet);
         return bullet;
     }
 
-    public State getState() {
-        return state;
+    public int getHealthPoints() {
+        return healthPoints;
     }
 
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public void hit() {
-        lives--;
-        if (lives <= 0) {
-            state = State.DEAD;
-        }
-    }
-
-    public int getLives() {
-        return lives;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void addScore(int points) {
-        score += points;
+    public void subHealthPoints(int hp) {
+        healthPoints -= hp;
     }
 }

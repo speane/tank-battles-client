@@ -2,12 +2,10 @@ package com.speane.game.help;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.MathUtils;
-import com.speane.game.entities.Bullet;
 import com.speane.game.entities.GameObject;
 import com.speane.game.entities.Tank;
 import javafx.scene.shape.Rectangle;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -47,7 +45,7 @@ public class CollisionDetector {
     }
 
     public void checkCollisions() {
-        for (Tank firstEnemy : enemies.values()) {
+        /*for (Tank firstEnemy : enemies.values()) {
             Iterator<Bullet> iterator = firstEnemy.getBullets().iterator();
             while (iterator.hasNext()) {
                 Bullet bullet = iterator.next();
@@ -61,7 +59,7 @@ public class CollisionDetector {
 
                 if (isCollision(bullet, player)) {
                     iterator.remove();
-                    player.hit();
+                    //player.hit();
                     Resourses.hitSound.play();
                 }
             }
@@ -70,12 +68,14 @@ public class CollisionDetector {
                 Bullet bullet = iterator.next();
                 if (isCollision(bullet, firstEnemy)) {
                     iterator.remove();
-                    firstEnemy.hit();
-                    player.addScore(200);
+                    //firstEnemy.hit();
+                    //player.addScore(200);
                     Resourses.hitSound.play();
                 }
             }
-        }
+        }*/
+
+
     }
 
     public boolean isOutOfField(GameObject object) {

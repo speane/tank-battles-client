@@ -10,11 +10,9 @@ import com.speane.game.entities.moving.Direction;
 public abstract class MovingObject extends GameObject {
     protected float rotateSpeed;
     protected Vector2 moveVector;
-    protected float rotation;
 
     public MovingObject(TextureRegion texture, float x, float y, float rotation) {
-        super(texture, x, y);
-        this.rotation = rotation;
+        super(texture, x, y, rotation);
     }
 
     public void move(Direction direction) {

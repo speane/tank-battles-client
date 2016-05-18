@@ -58,7 +58,7 @@ public class NetworkManager {
                 if (o instanceof MoveTank) {
                     MoveTank moveTank = (MoveTank) o;
                     Tank enemy = enemies.get(moveTank.id);
-                    enemy.setPostion(moveTank.x, moveTank.y);
+                    enemy.setPosition(moveTank.x, moveTank.y);
                     enemy.setRotation(moveTank.rotation);
                 }
                 else if (o instanceof CreatePlayer) {
@@ -76,7 +76,7 @@ public class NetworkManager {
                 else if (o instanceof DeadTank) {
                     DeadTank deadTank = (DeadTank) o;
                     System.out.println("Killer: " + deadTank.killerID);
-                    enemies.get(deadTank.id).setState(State.DEAD);
+                    enemies.remove(deadTank.id);
                 }
             }
         };
