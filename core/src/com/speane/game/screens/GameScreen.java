@@ -18,6 +18,7 @@ import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.*;
+import com.speane.game.score.GameScore;
 import com.speane.game.transfers.MoveTank;
 
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import static com.speane.game.help.TextureManager.TANK_TEXTURE;
  */
 public class GameScreen extends ScreenAdapter {
     private boolean gameOver = false;
-    private int score;
+    private GameScore score;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -66,6 +67,7 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void show() {
         tiledMap = game.getAssetManager().get("tiledmaps/tank_battles.tmx");
+        score = new GameScore();
         initEntities();
         initNetwork();
         initCamera();
@@ -81,8 +83,6 @@ public class GameScreen extends ScreenAdapter {
 
     private void initCamera() {
         camera = new OrthographicCamera();
-        //camera.position.set(player.getPosition().x, player.getPosition().y, 0);
-        //camera.update();
         viewport = new FitViewport(Config.WORLD_WIDTH, Config.WORLD_HEIGHT, camera);
         viewport.apply(true);
     }
@@ -111,7 +111,7 @@ public class GameScreen extends ScreenAdapter {
         moveTank.y = player.getY();
         networkManager.move(moveTank);
         inputHandler = new InputHandler(player, networkManager, tiledMap);
-        collisionDetector = new CollisionDetector(enemies, player);
+        collisionDetector = new CollisionDetector(enemies, player, score);
     }
 
     @Override

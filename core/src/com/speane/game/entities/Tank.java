@@ -62,4 +62,16 @@ public class Tank extends MovingObject {
     public void subHealthPoints(int hp) {
         healthPoints -= hp;
     }
+
+    public boolean isDead() {
+        return healthPoints <= 0;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 }

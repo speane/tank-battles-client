@@ -1,8 +1,8 @@
 package com.speane.game.entities;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import javafx.scene.shape.Rectangle;
 
 /**
  * Created by Evgeny Shilov on 05.04.2016.
