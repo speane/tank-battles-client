@@ -1,6 +1,7 @@
 package com.speane.game.help;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -18,14 +19,15 @@ import java.util.Map;
 
 import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
 import static com.speane.game.help.Config.*;
+import static com.speane.game.help.TextureManager.*;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.
  */
-public class Networker {
+public class NetworkManager {
     private Client client;
     private Map<Integer, Tank> enemies;
-    public Networker(Map<Integer, Tank> enemies) {
+    public NetworkManager(Map<Integer, Tank> enemies) {
         this.enemies = enemies;
         initNetwork();
     }
@@ -61,14 +63,14 @@ public class Networker {
                 }
                 else if (o instanceof CreatePlayer) {
                     CreatePlayer newPlayer = (CreatePlayer) o;
-                    Tank newTank = new Tank(newPlayer.x, newPlayer.y, newPlayer.rotation);
+                    Tank newTank = new Tank(ENEMY_TANK_TEXTURE, new Vector2(newPlayer.x, newPlayer.y), newPlayer.rotation);
                     newTank.ID = newPlayer.id;
                     enemies.put(newPlayer.id, newTank);
                 }
                 else if (o instanceof ShootTank) {
                     ShootTank shootTank = (ShootTank) o;
                     Tank tank = enemies.get(shootTank.id);
-                    tank.shoot(new Bullet(shootTank.x, shootTank.y, shootTank.rotation));
+                    tank.shoot(new Bullet(BULLET_TEXTURE, new Vector2(shootTank.x, shootTank.y), shootTank.rotation));
                     System.out.println("Shoot " + ((ShootTank) o).id);
                 }
                 else if (o instanceof DeadTank) {

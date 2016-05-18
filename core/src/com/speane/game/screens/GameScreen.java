@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.speane.game.TankGame;
@@ -25,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static com.speane.game.help.TextureManager.*;
+import static com.speane.game.help.Config.*;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -36,13 +39,15 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private Renderer renderer;
     private Map<Integer, Tank> enemies;
-    private Networker networker;
+    private NetworkManager networkManager;
     private InputHandler inputHandler;
     private CollisionDetector collisionDetector;
     private String playerName;
     private TankGame game;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
+    private float levelWidth;
+    private float levelHeight;
 
     public GameScreen(TankGame game) {
         this.game = game;
@@ -61,6 +66,9 @@ public class GameScreen extends ScreenAdapter {
         initNetwork();
         initCamera();
         loadResources();
+        TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer)tiledMap.getLayers().get("background");
+        levelWidth = tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
+        levelHeight = tiledMapTileLayer.getHeight() * tiledMapTileLayer.getTileHeight();
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView(camera);
         Resourses.backgroundMusic.setLooping(true);
@@ -80,12 +88,12 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initNetwork() {
-        networker = new Networker(enemies);
+        networkManager = new NetworkManager(enemies);
     }
 
     private void initTanks() {
-        player = new Tank(MathUtils.random(Config.DESKTOP_SCREEN_WIDTH),
-                MathUtils.random(Config.DESKTOP_SCREEN_HEIGHT),
+        player = new Tank(TANK_TEXTURE, new Vector2(MathUtils.random(Config.DESKTOP_SCREEN_WIDTH),
+                MathUtils.random(Config.DESKTOP_SCREEN_HEIGHT)),
                 MathUtils.random(360));
         enemies = new HashMap<Integer, Tank>();
     }
@@ -97,8 +105,8 @@ public class GameScreen extends ScreenAdapter {
         moveTank.rotation = player.getRotation();
         moveTank.x = player.getPosition().x;
         moveTank.y = player.getPosition().y;
-        networker.move(moveTank);
-        inputHandler = new InputHandler(player, networker);
+        networkManager.move(moveTank);
+        inputHandler = new InputHandler(player, networkManager);
         collisionDetector = new CollisionDetector(enemies, player);
     }
 
@@ -109,9 +117,7 @@ public class GameScreen extends ScreenAdapter {
         }
         updateAllBullets();
         collisionDetector.checkCollisions();
-        camera.position.set(player.getPosition().x, player.getPosition().y, camera.position.z);
-        camera.update();
-        orthogonalTiledMapRenderer.setView(camera);
+        updateCamera();
         draw();
     }
 
@@ -132,6 +138,29 @@ public class GameScreen extends ScreenAdapter {
                 iterator.remove();
             }
         }
+    }
+
+    private void updateCamera() {
+        float newCameraX;
+        float newCameraY;
+        if ((player.getPosition().x < DESKTOP_SCREEN_WIDTH / 2) ||
+                ((player.getPosition().x + DESKTOP_SCREEN_WIDTH / 2) > levelWidth)) {
+            newCameraX = camera.position.x;
+        }
+        else {
+            newCameraX = player.getPosition().x;
+        }
+
+        if ((player.getPosition().y < DESKTOP_SCREEN_HEIGHT / 2) ||
+                ((player.getPosition().y + DESKTOP_SCREEN_HEIGHT / 2) > levelHeight)) {
+            newCameraY = camera.position.y;
+        }
+        else {
+            newCameraY = player.getPosition().y;
+        }
+        camera.position.set(newCameraX, newCameraY, camera.position.z);
+        camera.update();
+        orthogonalTiledMapRenderer.setView(camera);
     }
 
     private boolean isOutOfScreen(float x, float y) {

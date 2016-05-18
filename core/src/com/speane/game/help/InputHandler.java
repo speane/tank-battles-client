@@ -13,11 +13,11 @@ import com.speane.game.transfers.ShootTank;
  */
 public class InputHandler {
     private Tank tank;
-    private Networker networker;
+    private NetworkManager networkManager;
 
-    public InputHandler(Tank tank, Networker networker) {
+    public InputHandler(Tank tank, NetworkManager networkManager) {
         this.tank = tank;
-        this.networker = networker;
+        this.networkManager = networkManager;
     }
 
     public void queryInput() {
@@ -52,7 +52,7 @@ public class InputHandler {
             shootTank.rotation = bullet.getRotation();
             shootTank.x = bullet.getPosition().x;
             shootTank.y = bullet.getPosition().y;
-            networker.shoot(shootTank);
+            networkManager.shoot(shootTank);
             Resourses.shootSound.play();
         }
 
@@ -61,7 +61,7 @@ public class InputHandler {
             moveTank.x = tank.getPosition().x;
             moveTank.y = tank.getPosition().y;
             moveTank.rotation = tank.getRotation();
-            networker.move(moveTank);
+            networkManager.move(moveTank);
         }
     }
 }

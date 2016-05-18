@@ -1,5 +1,6 @@
 package com.speane.game.entities;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.speane.game.entities.moving.Direction;
 
@@ -10,6 +11,11 @@ public abstract class MovingObject extends GameObject {
     protected float rotateSpeed;
     protected Vector2 moveVector;
     protected float rotation;
+
+    public MovingObject(TextureRegion texture, Vector2 position, float rotation) {
+        super(texture, position);
+        this.rotation = rotation;
+    }
 
     public void move(Direction direction) {
         switch (direction) {

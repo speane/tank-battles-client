@@ -1,14 +1,15 @@
 package com.speane.game.entities;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 
-import static com.speane.game.help.TextureManager.TANK_TEXTURE;
+import static com.speane.game.help.TextureManager.*;
 
 /**
- * Created by Speane on 08.03.2016.
+ * Created by Evgeny Shilov on 08.03.2016.
  */
 public class Tank extends MovingObject {
     public int ID;
@@ -18,11 +19,8 @@ public class Tank extends MovingObject {
 
     private State state;
 
-    public Tank(float x, float y, float rotation) {
-        this.position = new Vector2(x, y);
-        this.rotation = rotation;
-        this.width = TANK_TEXTURE.getRegionWidth();
-        this.height = TANK_TEXTURE.getRegionHeight();
+    public Tank(TextureRegion texture, Vector2 position, float rotation) {
+        super(texture, position, rotation);
 
         bullets = new ArrayList<Bullet>();
         lives = 3;
@@ -39,11 +37,12 @@ public class Tank extends MovingObject {
 
     public Bullet shoot() {
         Bullet bullet = new Bullet(
-                position.x + 35 - 50 * MathUtils.sinDeg(rotation),
-                position.y + 40 + 50 * MathUtils.cosDeg(rotation),
+                BULLET_TEXTURE,
+                    new Vector2(
+                        position.x + 35 - 50 * MathUtils.sinDeg(rotation),
+                        position.y + 40 + 50 * MathUtils.cosDeg(rotation)),
                 rotation
         );
-        System.out.println(position.x + " " + position.y + " " + rotation);
         bullets.add(bullet);
         return bullet;
     }
