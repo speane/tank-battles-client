@@ -29,6 +29,8 @@ public abstract class GameObject {
     public void setPosition(float x, float y) {
         this.position.x = x;
         this.position.y = y;
+        collisionModel.setX(x);
+        collisionModel.setY(y);
     }
 
     public int getWidth() {
@@ -37,5 +39,14 @@ public abstract class GameObject {
 
     public int getHeight() {
         return height;
+    }
+
+    public Rectangle getCollisionModel() {
+        return collisionModel;
+    }
+
+    protected void updateCollisionModel() {
+        collisionModel.setX(position.x);
+        collisionModel.setY(position.y);
     }
 }

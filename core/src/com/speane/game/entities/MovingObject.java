@@ -26,6 +26,7 @@ public abstract class MovingObject extends GameObject {
                 position.sub(moveVector);
                 break;
         }
+        updateCollisionModel();
     }
 
     public void rotate(Direction direction) {
@@ -39,6 +40,7 @@ public abstract class MovingObject extends GameObject {
                 moveVector.rotate(-rotateSpeed);
                 break;
         }
+        updateCollisionModel();
     }
 
     public float getRotation() {

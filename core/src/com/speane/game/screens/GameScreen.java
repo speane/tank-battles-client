@@ -117,6 +117,13 @@ public class GameScreen extends ScreenAdapter {
         }
         updateAllBullets();
         collisionDetector.checkCollisions();
+
+        if (CollisionDetector.collidesWithLayer(
+                (TiledMapTileLayer)tiledMap.getLayers().get("indestructible"),
+                player.getCollisionModel())) {
+            System.out.println("COLLISION!!!");
+        }
+
         updateCamera();
         draw();
     }

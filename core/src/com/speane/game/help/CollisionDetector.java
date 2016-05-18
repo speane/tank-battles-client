@@ -1,8 +1,11 @@
 package com.speane.game.help;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.MathUtils;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.GameObject;
 import com.speane.game.entities.Tank;
+import javafx.scene.shape.Rectangle;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -17,6 +20,30 @@ public class CollisionDetector {
     public CollisionDetector(Map<Integer, Tank> enemies, Tank player) {
         this.player = player;
         this.enemies = enemies;
+    }
+
+    public static boolean collidesWithLayer(TiledMapTileLayer layer, Rectangle collisionModel) {
+        float x = (float) collisionModel.getX();
+        float y = (float) collisionModel.getY();
+        float width = (float) collisionModel.getWidth();
+        float height = (float) collisionModel.getHeight();
+        int tileWidth = (int) layer.getTileWidth();
+        int tileHeight = (int) layer.getTileHeight();
+
+        int left = MathUtils.floor(x / tileWidth);
+        int right = MathUtils.floor((x + width) / tileWidth);
+        int bottom = MathUtils.floor(y / tileHeight);
+        int top = MathUtils.floor((y + height) / tileHeight);
+
+        for (int i = left; i <= right; i++) {
+            for (int j = bottom; j <= top; j++) {
+                if (layer.getCell(i, j) != null) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public void checkCollisions() {
