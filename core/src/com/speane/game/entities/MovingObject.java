@@ -12,8 +12,8 @@ public abstract class MovingObject extends GameObject {
     protected Vector2 moveVector;
     protected float rotation;
 
-    public MovingObject(TextureRegion texture, Vector2 position, float rotation) {
-        super(texture, position);
+    public MovingObject(TextureRegion texture, float x, float y, float rotation) {
+        super(texture, x, y);
         this.rotation = rotation;
     }
 

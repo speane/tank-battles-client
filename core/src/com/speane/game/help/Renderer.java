@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.speane.game.entities.MovingObject;
 
 /**
@@ -26,27 +25,17 @@ public class Renderer {
     }
 
     public void draw(MovingObject entity, TextureRegion texture) {
-        int width = entity.getWidth();
-        int height = entity.getHeight();
-        Vector2 coordinates = entity.getPosition();
-        float rotation = entity.getRotation();
         batch.draw(
-                texture,
-                coordinates.x,
-                coordinates.y,
-                width / 2,
-                height / 2,
-                width,
-                height,
+                entity.getTexture(),
+                entity.getX(),
+                entity.getY(),
+                entity.getTexture().getRegionWidth() / 2,
+                entity.getTexture().getRegionHeight() / 2,
+                entity.getTexture().getRegionWidth(),
+                entity.getTexture().getRegionHeight(),
                 1,
                 1,
-                rotation/*,
-                0,
-                0,
-                width,
-                height,
-                false,
-                false*/
+                entity.getRotation()
         );
     }
 

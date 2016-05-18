@@ -11,7 +11,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.speane.game.TankGame;
@@ -26,8 +25,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
+import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
 import static com.speane.game.help.TextureManager.*;
-import static com.speane.game.help.Config.*;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -92,8 +92,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initTanks() {
-        player = new Tank(TANK_TEXTURE, new Vector2(MathUtils.random(Config.DESKTOP_SCREEN_WIDTH),
-                MathUtils.random(Config.DESKTOP_SCREEN_HEIGHT)),
+        player = new Tank(TANK_TEXTURE, (MathUtils.random(Config.DESKTOP_SCREEN_WIDTH)),
+                MathUtils.random(Config.DESKTOP_SCREEN_HEIGHT),
                 MathUtils.random(360));
         enemies = new HashMap<Integer, Tank>();
     }
@@ -103,10 +103,10 @@ public class GameScreen extends ScreenAdapter {
         renderer = new Renderer(batch);
         MoveTank moveTank = new MoveTank();
         moveTank.rotation = player.getRotation();
-        moveTank.x = player.getPosition().x;
-        moveTank.y = player.getPosition().y;
+        moveTank.x = player.getX();
+        moveTank.y = player.getY();
         networkManager.move(moveTank);
-        inputHandler = new InputHandler(player, networkManager);
+        inputHandler = new InputHandler(player, networkManager, tiledMap);
         collisionDetector = new CollisionDetector(enemies, player);
     }
 
@@ -141,7 +141,7 @@ public class GameScreen extends ScreenAdapter {
         while (iterator.hasNext()) {
             bullet = iterator.next();
             bullet.move(Direction.FORWARD);
-            if (isOutOfScreen(bullet.getPosition().x, bullet.getPosition().y)) {
+            if (isOutOfScreen(bullet.getX(), bullet.getY())) {
                 iterator.remove();
             }
         }
@@ -150,20 +150,20 @@ public class GameScreen extends ScreenAdapter {
     private void updateCamera() {
         float newCameraX;
         float newCameraY;
-        if ((player.getPosition().x < DESKTOP_SCREEN_WIDTH / 2) ||
-                ((player.getPosition().x + DESKTOP_SCREEN_WIDTH / 2) > levelWidth)) {
+        if ((player.getX() < DESKTOP_SCREEN_WIDTH / 2) ||
+                ((player.getX() + DESKTOP_SCREEN_WIDTH / 2) > levelWidth)) {
             newCameraX = camera.position.x;
         }
         else {
-            newCameraX = player.getPosition().x;
+            newCameraX = player.getX();
         }
 
-        if ((player.getPosition().y < DESKTOP_SCREEN_HEIGHT / 2) ||
-                ((player.getPosition().y + DESKTOP_SCREEN_HEIGHT / 2) > levelHeight)) {
+        if ((player.getY() < DESKTOP_SCREEN_HEIGHT / 2) ||
+                ((player.getY() + DESKTOP_SCREEN_HEIGHT / 2) > levelHeight)) {
             newCameraY = camera.position.y;
         }
         else {
-            newCameraY = player.getPosition().y;
+            newCameraY = player.getY();
         }
         camera.position.set(newCameraX, newCameraY, camera.position.z);
         camera.update();

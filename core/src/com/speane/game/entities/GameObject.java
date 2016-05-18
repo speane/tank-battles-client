@@ -11,33 +11,44 @@ public abstract class GameObject {
     protected TextureRegion texture;
     protected Rectangle collisionModel;
     protected Vector2 position;
-    protected int width;
-    protected int height;
+    protected float width;
+    protected float height;
 
-    public GameObject(TextureRegion texture, Vector2 position) {
+    public GameObject(TextureRegion texture, float x, float y) {
         this.texture = texture;
-        this.position = position;
+        position = new Vector2(x, y);
         collisionModel = new Rectangle(position.x, position.y, texture.getRegionWidth(), texture.getRegionHeight());
         width = texture.getRegionWidth();
         height = texture.getRegionHeight();
     }
 
-    public Vector2 getPosition() {
-        return position;
+    public int getX() {
+        return (int) position.x;
     }
 
-    public void setPosition(float x, float y) {
-        this.position.x = x;
-        this.position.y = y;
-        collisionModel.setX(x);
-        collisionModel.setY(y);
+    public int getY() {
+        return (int) position.y;
     }
 
-    public int getWidth() {
+    public void setX(int x) {
+        position.x = x;
+    }
+
+    public void setY(int y) {
+        position.y = y;
+    }
+
+    public void setPostion(float x, float y) {
+        position.x = x;
+        position.y = y;
+        updateCollisionModel();
+    }
+
+    public float getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 
@@ -48,5 +59,9 @@ public abstract class GameObject {
     protected void updateCollisionModel() {
         collisionModel.setX(position.x);
         collisionModel.setY(position.y);
+    }
+
+    public TextureRegion getTexture() {
+        return texture;
     }
 }

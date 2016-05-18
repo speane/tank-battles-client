@@ -79,8 +79,8 @@ public class CollisionDetector {
     }
 
     public boolean isOutOfField(GameObject object) {
-        float x = object.getPosition().x;
-        float y = object.getPosition().y;
+        float x = object.getX();
+        float y = object.getY();
         return  x > Config.DESKTOP_SCREEN_WIDTH ||
                 x < 0 ||
                 y > Config.DESKTOP_SCREEN_HEIGHT ||
@@ -88,14 +88,14 @@ public class CollisionDetector {
     }
 
     public boolean isCollision(GameObject first, GameObject second) {
-        float left1 = first.getPosition().x;
+        float left1 = first.getX();
         float rigth1 = left1 + first.getWidth();
-        float bottom1 = first.getPosition().y;
+        float bottom1 = first.getY();
         float top1 = bottom1 + first.getHeight();
 
-        float left2 = second.getPosition().x;
+        float left2 = second.getX();
         float right2 = left2 + second.getWidth();
-        float bottom2 = second.getPosition().y;
+        float bottom2 = second.getY();
         float top2 = bottom2 + second.getHeight();
 
         return (left1 < right2 &&

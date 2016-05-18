@@ -1,7 +1,6 @@
 package com.speane.game.help;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -17,9 +16,10 @@ import com.speane.game.transfers.ShootTank;
 import java.io.IOException;
 import java.util.Map;
 
-import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
 import static com.speane.game.help.Config.*;
-import static com.speane.game.help.TextureManager.*;
+import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
+import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
+import static com.speane.game.help.TextureManager.ENEMY_TANK_TEXTURE;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.
@@ -58,19 +58,19 @@ public class NetworkManager {
                 if (o instanceof MoveTank) {
                     MoveTank moveTank = (MoveTank) o;
                     Tank enemy = enemies.get(moveTank.id);
-                    enemy.setPosition(moveTank.x, moveTank.y);
+                    enemy.setPostion(moveTank.x, moveTank.y);
                     enemy.setRotation(moveTank.rotation);
                 }
                 else if (o instanceof CreatePlayer) {
                     CreatePlayer newPlayer = (CreatePlayer) o;
-                    Tank newTank = new Tank(ENEMY_TANK_TEXTURE, new Vector2(newPlayer.x, newPlayer.y), newPlayer.rotation);
+                    Tank newTank = new Tank(ENEMY_TANK_TEXTURE, newPlayer.x, newPlayer.y, newPlayer.rotation);
                     newTank.ID = newPlayer.id;
                     enemies.put(newPlayer.id, newTank);
                 }
                 else if (o instanceof ShootTank) {
                     ShootTank shootTank = (ShootTank) o;
                     Tank tank = enemies.get(shootTank.id);
-                    tank.shoot(new Bullet(BULLET_TEXTURE, new Vector2(shootTank.x, shootTank.y), shootTank.rotation));
+                    tank.shoot(new Bullet(BULLET_TEXTURE, shootTank.x, shootTank.y, shootTank.rotation));
                     System.out.println("Shoot " + ((ShootTank) o).id);
                 }
                 else if (o instanceof DeadTank) {

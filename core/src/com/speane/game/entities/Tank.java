@@ -19,8 +19,8 @@ public class Tank extends MovingObject {
 
     private State state;
 
-    public Tank(TextureRegion texture, Vector2 position, float rotation) {
-        super(texture, position, rotation);
+    public Tank(TextureRegion texture, float x, float y, float rotation) {
+        super(texture, x, y, rotation);
 
         bullets = new ArrayList<Bullet>();
         lives = 3;
@@ -38,9 +38,8 @@ public class Tank extends MovingObject {
     public Bullet shoot() {
         Bullet bullet = new Bullet(
                 BULLET_TEXTURE,
-                    new Vector2(
-                        position.x + 35 - 50 * MathUtils.sinDeg(rotation),
-                        position.y + 40 + 50 * MathUtils.cosDeg(rotation)),
+                (int) (position.x + 35 - 50 * MathUtils.sinDeg(rotation)),
+                (int) (position.y + 40 + 50 * MathUtils.cosDeg(rotation)),
                 rotation
         );
         bullets.add(bullet);
