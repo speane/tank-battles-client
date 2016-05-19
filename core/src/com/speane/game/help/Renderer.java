@@ -16,7 +16,7 @@ public class Renderer {
     public Renderer(Batch batch) {
         this.batch = batch;
         font = new BitmapFont();
-        font.setColor(Color.GREEN);
+        font.setColor(Color.BLUE);
     }
 
     public void drawText(String text, int x, int y) {

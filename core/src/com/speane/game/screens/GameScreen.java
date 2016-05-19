@@ -27,9 +27,7 @@ import java.util.Map;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
-import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
-import static com.speane.game.help.TextureManager.ENEMY_TANK_TEXTURE;
-import static com.speane.game.help.TextureManager.TANK_TEXTURE;
+import static com.speane.game.help.TextureManager.*;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -83,8 +81,33 @@ public class GameScreen extends ScreenAdapter {
 
     private void initCamera() {
         camera = new OrthographicCamera();
+        float cameraX;
+        float cameraY;
+        if ((player.getX() + Config.DESKTOP_SCREEN_WIDTH / 2) > levelWidth) {
+            cameraX = levelWidth - Config.DESKTOP_SCREEN_WIDTH / 2;
+        }
+        else if ((player.getX() - Config.DESKTOP_SCREEN_WIDTH / 2) < 0) {
+            cameraX = Config.DESKTOP_SCREEN_WIDTH / 2;
+        }
+        else {
+            cameraX = player.getX();
+        }
+
+        if ((player.getY() + Config.DESKTOP_SCREEN_HEIGHT / 2) > levelHeight) {
+            cameraY = levelHeight - Config.DESKTOP_SCREEN_HEIGHT / 2;
+        }
+        else if ((player.getY() - Config.DESKTOP_SCREEN_HEIGHT / 2) < 0) {
+            cameraY = Config.DESKTOP_SCREEN_HEIGHT / 2;
+        }
+        else {
+            cameraY = player.getY();
+        }
+
         viewport = new FitViewport(Config.DESKTOP_SCREEN_WIDTH, Config.DESKTOP_SCREEN_HEIGHT, camera);
         viewport.apply(true);
+
+        camera.position.set(cameraX, cameraY, camera.position.z);
+        camera.update();
     }
 
     private void initEntities() {
@@ -99,7 +122,8 @@ public class GameScreen extends ScreenAdapter {
         do {
             player = new Tank(TANK_TEXTURE, (MathUtils.random((int) levelWidth)),
                     MathUtils.random((int) levelHeight),
-                    MathUtils.random(360));
+                    MathUtils.random(4) * 90);
+            //player = new Tank(TANK_TEXTURE, 1400, 1400, 90);
         } while (CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("indestructible"),
                 player.getCollisionModel()));
         enemies = new HashMap<Integer, Tank>();
@@ -200,6 +224,9 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawTank(Tank tank, TextureRegion texture) {
         renderer.draw(tank, texture);
+        renderer.drawText("[" + tank.getLevel() + " lvl] " + tank.getHealthPoints() + "hp",
+                tank.getX() - 10,
+                (int) (tank.getY() + tank.getCollisionModel().getHeight() + 30));
         for (Bullet bullet : tank.getBullets()) {
             renderer.draw(bullet, BULLET_TEXTURE);
         }
