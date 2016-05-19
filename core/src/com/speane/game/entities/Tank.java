@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 
-import static com.speane.game.help.TextureManager.*;
+import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
 
 /**
  * Created by Evgeny Shilov on 08.03.2016.
@@ -73,5 +73,9 @@ public class Tank extends MovingObject {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 }

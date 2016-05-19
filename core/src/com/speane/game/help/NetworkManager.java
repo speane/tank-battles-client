@@ -6,12 +6,8 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Bullet;
-import com.speane.game.entities.State;
 import com.speane.game.entities.Tank;
-import com.speane.game.transfers.CreatePlayer;
-import com.speane.game.transfers.DeadTank;
-import com.speane.game.transfers.MoveTank;
-import com.speane.game.transfers.ShootTank;
+import com.speane.game.transfers.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -49,6 +45,7 @@ public class NetworkManager {
         kryo.register(CreatePlayer.class);
         kryo.register(ShootTank.class);
         kryo.register(DeadTank.class);
+        kryo.register(HitTank.class);
     }
 
     private void initNetworkListener() {
@@ -78,6 +75,10 @@ public class NetworkManager {
                     System.out.println("Killer: " + deadTank.killerID);
                     enemies.remove(deadTank.id);
                 }
+                else if (o instanceof HitTank) {
+                    HitTank hitTank = (HitTank) o;
+                    enemies.get(hitTank.id).subHealthPoints(hitTank.damage);
+                }
             }
         };
 
@@ -87,6 +88,10 @@ public class NetworkManager {
                 Gdx.app.postRunnable(runnable);
             }
         });
+    }
+
+    public <T> void sendEvent(T event) {
+        client.sendTCP(event);
     }
 
     public void shoot(ShootTank shootTank) {

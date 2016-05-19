@@ -18,7 +18,6 @@ import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.*;
-import com.speane.game.score.GameScore;
 import com.speane.game.transfers.MoveTank;
 
 import java.util.HashMap;
@@ -34,7 +33,7 @@ import static com.speane.game.help.TextureManager.*;
  */
 public class GameScreen extends ScreenAdapter {
     private boolean gameOver = false;
-    private GameScore score;
+    private int score;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -51,6 +50,30 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private float levelWidth;
     private float levelHeight;
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public NetworkManager getNetworkManager() {
+        return networkManager;
+    }
+
+    public TiledMap getTiledMap() {
+        return tiledMap;
+    }
+
+    public Tank getPlayer() {
+        return player;
+    }
+
+    public Map<Integer, Tank> getEnemies() {
+        return enemies;
+    }
 
     public GameScreen(TankGame game) {
         this.game = game;
@@ -125,7 +148,9 @@ public class GameScreen extends ScreenAdapter {
                     MathUtils.random(4) * 90);
             //player = new Tank(TANK_TEXTURE, 1400, 1400, 90);
         } while (CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("indestructible"),
-                player.getCollisionModel()));
+                player.getCollisionModel()) ||
+                CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("impassable"),
+                        player.getCollisionModel()));
         enemies = new HashMap<Integer, Tank>();
     }
 
@@ -138,11 +163,13 @@ public class GameScreen extends ScreenAdapter {
         moveTank.y = player.getY();
         networkManager.move(moveTank);
         inputHandler = new InputHandler(player, networkManager, tiledMap);
-        collisionDetector = new CollisionDetector(enemies, player, score);
+        collisionDetector = new CollisionDetector(this);
     }
 
     @Override
     public void render(float delta) {
+        super.render(delta);
+        clearScreen();
         if (!gameOver) {
             inputHandler.queryInput();
         }
@@ -239,7 +266,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void clearScreen() {
-        Gdx.gl.glClearColor(0.75f, 0.9f, 0.8f, Color.BLACK.a);
+        Gdx.gl.glClearColor(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, Color.BLACK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 }

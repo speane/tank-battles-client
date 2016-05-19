@@ -7,27 +7,26 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
-import static com.speane.game.help.TextureManager.*;
+import static com.speane.game.help.TextureManager.START_MENU_BACKGROUND_TEXTURE;
 
 /**
- * Created by Evgeny Shilov on 16.05.2016.
+ * Created by Evgeny Shilov on 19.05.2016.
  */
-public class StartScreen extends ScreenAdapter {
+public class AuthorizationScreen extends ScreenAdapter {
     private Stage stage;
     private TankGame game;
 
-    public StartScreen(TankGame game) {
+    public AuthorizationScreen(TankGame game) {
         this.game = game;
     }
 
@@ -46,22 +45,26 @@ public class StartScreen extends ScreenAdapter {
         textField.setMessageText("Enter your name");
         stage.addActor(textField);
 
-        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.imageUp = new TextureRegionDrawable(PLAY_BUTTON_TEXTURE);
-        style.imageOver = new TextureRegionDrawable(PLAY_BUTTON_PRESSED_TEXTURE);
-
-        ImageButton imageButton = new ImageButton(style);
-        imageButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
-        imageButton.addListener(new ActorGestureListener() {
+        TextButton authorizeButton = new TextButton("Authorize", skin);
+        authorizeButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
+        authorizeButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-                super.tap(event, x, y, count, button);
-                game.setPlayerName(textField.getText());
-                game.setScreen(new GameScreen(game));
+                System.out.println("AUTHORIZE");
                 dispose();
             }
         });
-        stage.addActor(imageButton);
+        TextButton registerButton = new TextButton("Register", skin);
+        registerButton.setPosition(DESKTOP_SCREEN_WIDTH / 2,
+                DESKTOP_SCREEN_HEIGHT / 2 - registerButton.getHeight() - 5, Align.center);
+        registerButton.addListener(new ActorGestureListener() {
+            @Override
+            public void tap(InputEvent event, float x, float y, int count, int button) {
+                System.out.println("REGISTER");
+                dispose();
+            }
+        });
+        stage.addActor(authorizeButton);
     }
 
     @Override

@@ -55,7 +55,9 @@ public class InputHandler {
 
         if (moved) {
             if (CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get("indestructible"),
-                    tank.getCollisionModel())) {
+                    tank.getCollisionModel()) ||
+                    CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get("impassable"),
+                            tank.getCollisionModel())) {
                 tank.setPosition(oldX, oldY);
             }
         }

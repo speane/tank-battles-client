@@ -6,7 +6,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.GameObject;
 import com.speane.game.entities.Tank;
-import com.speane.game.score.GameScore;
+import com.speane.game.screens.GameScreen;
+import com.speane.game.transfers.HitTank;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -18,11 +19,13 @@ public class CollisionDetector {
     private Tank player;
     private Map<Integer, Tank> enemies;
     private GameScore score;
+    private NetworkManager networkManager;
 
-    public CollisionDetector(Map<Integer, Tank> enemies, Tank player, GameScore score) {
-        this.player = player;
-        this.enemies = enemies;
-        this.score = score;
+    public CollisionDetector(GameScreen gameScreen) {
+        this.player = gameScreen.getPlayer();
+        this.enemies = gameScreen.getEnemies();
+        this.score = gameScreen.getScore();
+        this.networkManager = gameScreen.;
     }
 
     public static boolean collidesWithLayer(TiledMapTileLayer layer, Rectangle collisionModel) {
@@ -61,6 +64,11 @@ public class CollisionDetector {
                     enemy.hit(player);
                     if (player.isDead()) {
                         return;
+                    }
+                    else {
+                        HitTank hitTank = new HitTank();
+                        hitTank.damage = enemy.getDamage();
+                        networkManager.sendEvent(hitTank);
                     }
                 }
             }
