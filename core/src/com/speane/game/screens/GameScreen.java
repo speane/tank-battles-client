@@ -19,6 +19,7 @@ import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.*;
 import com.speane.game.transfers.CreatePlayer;
+import com.speane.game.transfers.LevelUp;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,6 +86,21 @@ public class GameScreen extends ScreenAdapter {
         playerName = game.getPlayerName();
     }
 
+    public void addScore(int deltaScore) {
+        score += deltaScore;
+        nextLevelScore += deltaScore;
+        if (nextLevelScore >= Config.LEVEL_UP_SCORE) {
+            int levelsToUp = nextLevelScore / Config.LEVEL_UP_SCORE;
+            LevelUp levelUp = new LevelUp();
+            levelUp.healthPoints = levelsToUp * Config.HEALTH_POINTS_FOR_LEVEL_UP;
+            levelUp.level = levelsToUp;
+            player.levelUp(levelsToUp);
+            player.addHealthPoints(Config.HEALTH_POINTS_FOR_LEVEL_UP);
+            networkManager.sendEvent(levelUp);
+            nextLevelScore = nextLevelScore % Config.LEVEL_UP_SCORE;
+        }
+    }
+
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
@@ -142,7 +158,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void initNetwork() {
-        networkManager = new NetworkManager(enemies);
+        networkManager = new NetworkManager(this);
     }
 
     private void initTanks() {

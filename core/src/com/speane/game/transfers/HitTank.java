@@ -6,4 +6,5 @@ package com.speane.game.transfers;
 public class HitTank {
     public int id;
     public int damage;
+    public int shooterID;
 }

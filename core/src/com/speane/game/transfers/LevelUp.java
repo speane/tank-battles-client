@@ -6,4 +6,5 @@ package com.speane.game.transfers;
 public class LevelUp {
     public int id;
     public int level;
+    public int healthPoints;
 }

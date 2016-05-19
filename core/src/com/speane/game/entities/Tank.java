@@ -1,7 +1,6 @@
 package com.speane.game.entities;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
@@ -37,8 +36,8 @@ public class Tank extends MovingObject {
     public Bullet shoot() {
         Bullet bullet = new Bullet(
                 BULLET_TEXTURE,
-                (int) (position.x + 35 - 50 * MathUtils.sinDeg(rotation)),
-                (int) (position.y + 40 + 50 * MathUtils.cosDeg(rotation)),
+                collisionModel.getX() + collisionModel.getWidth() / 2,
+                collisionModel.getY() + collisionModel.getHeight() / 2,
                 rotation
         );
         bullets.add(bullet);
@@ -65,6 +64,8 @@ public class Tank extends MovingObject {
         healthPoints -= hp;
     }
 
+    public void addHealthPoints(int hp) { healthPoints += hp; }
+
     public boolean isDead() {
         return healthPoints <= 0;
     }
@@ -85,7 +86,6 @@ public class Tank extends MovingObject {
 
     public void levelUp(int levels) {
         setLevel(getLevel() + levels);
-        healthPoints += 50;
     }
 
     public void setHealthPoints(int healthPoints) {

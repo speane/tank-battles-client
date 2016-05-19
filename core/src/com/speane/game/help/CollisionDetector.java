@@ -9,7 +9,6 @@ import com.speane.game.entities.Tank;
 import com.speane.game.screens.GameScreen;
 import com.speane.game.transfers.DeadTank;
 import com.speane.game.transfers.HitTank;
-import com.speane.game.transfers.LevelUp;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -55,7 +54,52 @@ public class CollisionDetector {
     }
 
     public void checkCollisions() {
-        Iterator<Tank> enemyIterator = enemies.values().iterator();
+        Iterator<Integer> firstEnemyKeyIterator = enemies.keySet().iterator();
+        while (firstEnemyKeyIterator.hasNext()) {
+            int firstKey = firstEnemyKeyIterator.next();
+            Tank firstEnemy = enemies.get(firstKey);
+            Iterator<Bullet> bulletIterator = firstEnemy.getBullets().iterator();
+            while (bulletIterator.hasNext()) {
+                Bullet bullet = bulletIterator.next();
+                boolean bulletRemoved = false;
+                for (Tank secondEnemy : enemies.values()) {
+                    if (firstEnemy != secondEnemy) {
+                        if (isCollision(bullet, secondEnemy)) {
+                            bulletIterator.remove();
+                            bulletRemoved = true;
+                            break;
+                        }
+                    }
+                }
+                if (!bulletRemoved && isCollision(bullet, player)) {
+                    bulletIterator.remove();
+
+                    firstEnemy.hit(player);
+                    HitTank hitTank = new HitTank();
+                    hitTank.damage = firstEnemy.getDamage();
+                    hitTank.shooterID = firstKey;
+                    networkManager.sendEvent(hitTank);
+
+                    if (player.isDead()) {
+                        DeadTank deadTank = new DeadTank();
+                        deadTank.killerID = firstKey;
+                        networkManager.sendEvent(deadTank);
+                        gameScreen.setGameOver(true);
+                        return;
+                    }
+                }
+            }
+            Iterator<Bullet> playerBulletIterator = player.getBullets().iterator();
+            while (playerBulletIterator.hasNext()) {
+                Bullet bullet = playerBulletIterator.next();
+                if (isCollision(bullet, firstEnemy)) {
+                    playerBulletIterator.remove();
+                }
+            }
+        }
+
+
+        /*Iterator<Tank> enemyIterator = enemies.values().iterator();
         while (enemyIterator.hasNext()) {
             Tank enemy = enemyIterator.next();
             Iterator<Bullet> bulletIterator = enemy.getBullets().iterator();
@@ -92,14 +136,15 @@ public class CollisionDetector {
                     if (gameScreen.getNextLevelScore() >= Config.LEVEL_UP_SCORE) {
                         int levelsToUp = gameScreen.getNextLevelScore() / Config.LEVEL_UP_SCORE;
                         player.levelUp(levelsToUp);
+                        player.addHealthPoints(Config.HEALTH_POINTS_FOR_LEVEL_UP);
                         LevelUp levelUp = new LevelUp();
                         levelUp.level = levelsToUp;
+                        levelUp.healthPoints = Config.HEALTH_POINTS_FOR_LEVEL_UP;
                         networkManager.sendEvent(levelUp);
                         gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() % Config.LEVEL_UP_SCORE);
                     }
                 }
-            }
-        }
+            }*/
     }
 
     public boolean isOutOfField(GameObject object) {

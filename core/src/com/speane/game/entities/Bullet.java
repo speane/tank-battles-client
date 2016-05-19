@@ -11,7 +11,7 @@ import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
 public class Bullet extends MovingObject {
     public Bullet(TextureRegion texture, float x, float y, float rotation) {
         super(texture, x, y, rotation);
-        this.moveVector = new Vector2(0, 5);
+        this.moveVector = new Vector2(0, 10);
         this.rotateSpeed = 3.f;
         this.moveVector.rotate(rotation);
         this.width = BULLET_TEXTURE.getRegionWidth();

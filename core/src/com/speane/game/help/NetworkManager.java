@@ -7,6 +7,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
+import com.speane.game.screens.GameScreen;
 import com.speane.game.transfers.*;
 
 import java.io.IOException;
@@ -23,8 +24,11 @@ import static com.speane.game.help.TextureManager.ENEMY_TANK_TEXTURE;
 public class NetworkManager {
     private Client client;
     private Map<Integer, Tank> enemies;
-    public NetworkManager(Map<Integer, Tank> enemies) {
-        this.enemies = enemies;
+    private GameScreen gameScreen;
+
+    public NetworkManager(GameScreen gameScreen) {
+        this.gameScreen = gameScreen;
+        this.enemies = gameScreen.getEnemies();
         initNetwork();
     }
     private void initNetwork() {
@@ -80,19 +84,31 @@ public class NetworkManager {
                 else if (o instanceof DeadTank) {
                     DeadTank deadTank = (DeadTank) o;
                     System.out.println("Killer: " + deadTank.killerID);
+
                     enemies.remove(deadTank.id);
+                    if (!enemies.containsKey(deadTank.killerID)) {
+                        gameScreen.addScore(Config.SCORE_FOR_KILL);
+                    }
                 }
                 else if (o instanceof HitTank) {
                     HitTank hitTank = (HitTank) o;
-                    enemies.get(hitTank.id).subHealthPoints(hitTank.damage);
+                    if (enemies.containsKey(hitTank.shooterID)) {
+                        enemies.get(hitTank.shooterID).hit(enemies.get(hitTank.id));
+                    }
+                    else {
+                        gameScreen.getPlayer().hit(enemies.get(hitTank.id));
+                        gameScreen.addScore(Config.SCORE_FOR_HIT);
+                    }
+                    /*enemies.get(hitTank.id).subHealthPoints(hitTank.damage);
                     if (enemies.get(hitTank.id).isDead()) {
                         enemies.remove(hitTank.id);
-                    }
+                    }*/
                 }
                 else if (o instanceof LevelUp) {
                     LevelUp levelUp = (LevelUp) o;
                     System.out.println("lvlup: " + levelUp.id + " " + levelUp.level);
                     enemies.get(levelUp.id).levelUp(levelUp.level);
+                    enemies.get(levelUp.id).addHealthPoints(levelUp.healthPoints);
                 }
             }
         };
