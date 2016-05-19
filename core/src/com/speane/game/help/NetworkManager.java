@@ -46,12 +46,14 @@ public class NetworkManager {
         kryo.register(ShootTank.class);
         kryo.register(DeadTank.class);
         kryo.register(HitTank.class);
+        kryo.register(LevelUp.class);
     }
 
     private void initNetworkListener() {
         Listener listener = new Listener() {
             @Override
             public void received(Connection c, Object o) {
+                System.out.println(o.getClass());
                 if (o instanceof MoveTank) {
                     MoveTank moveTank = (MoveTank) o;
                     Tank enemy = enemies.get(moveTank.id);
@@ -86,6 +88,11 @@ public class NetworkManager {
                     if (enemies.get(hitTank.id).isDead()) {
                         enemies.remove(hitTank.id);
                     }
+                }
+                else if (o instanceof LevelUp) {
+                    LevelUp levelUp = (LevelUp) o;
+                    System.out.println("lvlup: " + levelUp.id + " " + levelUp.level);
+                    enemies.get(levelUp.id).levelUp(levelUp.level);
                 }
             }
         };

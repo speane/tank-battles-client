@@ -9,6 +9,7 @@ import com.speane.game.entities.Tank;
 import com.speane.game.screens.GameScreen;
 import com.speane.game.transfers.DeadTank;
 import com.speane.game.transfers.HitTank;
+import com.speane.game.transfers.LevelUp;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -88,8 +89,12 @@ public class CollisionDetector {
                                 ((int) (Config.SCORE_FOR_KILL / ((double) player.getLevel() / enemy.getLevel()))));
                     }
                     gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() + gameScreen.getScore() - oldScore);
-                    if (gameScreen.getNextLevelScore() > Config.LEVEL_UP_SCORE) {
-                        player.levelUp(gameScreen.getNextLevelScore() / Config.LEVEL_UP_SCORE);
+                    if (gameScreen.getNextLevelScore() >= Config.LEVEL_UP_SCORE) {
+                        int levelsToUp = gameScreen.getNextLevelScore() / Config.LEVEL_UP_SCORE;
+                        player.levelUp(levelsToUp);
+                        LevelUp levelUp = new LevelUp();
+                        levelUp.level = levelsToUp;
+                        networkManager.sendEvent(levelUp);
                         gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() % Config.LEVEL_UP_SCORE);
                     }
                 }
