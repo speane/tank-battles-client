@@ -12,7 +12,6 @@ import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
  * Created by Evgeny Shilov on 08.03.2016.
  */
 public class Tank extends MovingObject {
-    public int ID;
     private int healthPoints;
     private int level;
     private int damage;
@@ -24,7 +23,7 @@ public class Tank extends MovingObject {
         bullets = new ArrayList<Bullet>();
         healthPoints = 100;
         damage = 20;
-        level = 1;
+        setLevel(1);
 
         rotateSpeed = 2.5f;
         moveVector = new Vector2(0, 3);
@@ -47,7 +46,10 @@ public class Tank extends MovingObject {
     }
 
     public void hit(Tank tank) {
+        System.out.println(tank.getHealthPoints());
+        System.out.println(damage);
         tank.subHealthPoints(damage);
+        System.out.println(tank.getHealthPoints());
     }
 
     public Bullet shoot(Bullet bullet) {
@@ -73,9 +75,20 @@ public class Tank extends MovingObject {
 
     public void setLevel(int level) {
         this.level = level;
+        damage = level * 20;
+        System.out.println("NEW LEVEL " + level + " damage: " + damage);
     }
 
     public int getDamage() {
         return damage;
+    }
+
+    public void levelUp(int levels) {
+        setLevel(getLevel() + levels);
+        healthPoints += 50;
+    }
+
+    public void setHealthPoints(int healthPoints) {
+        this.healthPoints = healthPoints;
     }
 }

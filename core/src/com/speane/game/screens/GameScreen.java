@@ -18,7 +18,7 @@ import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.help.*;
-import com.speane.game.transfers.MoveTank;
+import com.speane.game.transfers.CreatePlayer;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +34,7 @@ import static com.speane.game.help.TextureManager.*;
 public class GameScreen extends ScreenAdapter {
     private boolean gameOver = false;
     private int score;
+    private int nextLevelScore;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -53,6 +54,10 @@ public class GameScreen extends ScreenAdapter {
 
     public int getScore() {
         return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public void setGameOver(boolean gameOver) {
@@ -91,7 +96,6 @@ public class GameScreen extends ScreenAdapter {
         TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer)tiledMap.getLayers().get("background");
         levelWidth = tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
         levelHeight = tiledMapTileLayer.getHeight() * tiledMapTileLayer.getTileHeight();
-        score = new GameScore();
         initEntities();
         initNetwork();
         initCamera();
@@ -157,11 +161,19 @@ public class GameScreen extends ScreenAdapter {
     private void loadResources() {
         batch = new SpriteBatch();
         renderer = new Renderer(batch);
-        MoveTank moveTank = new MoveTank();
+
+        CreatePlayer createPlayer = new CreatePlayer();
+        createPlayer.x = player.getX();
+        createPlayer.y = player.getY();
+        createPlayer.healthPoints = player.getHealthPoints();
+        createPlayer.level = player.getLevel();
+        createPlayer.rotation = player.getRotation();
+        networkManager.sendEvent(createPlayer);
+        /*MoveTank moveTank = new MoveTank();
         moveTank.rotation = player.getRotation();
         moveTank.x = player.getX();
         moveTank.y = player.getY();
-        networkManager.move(moveTank);
+        networkManager.move(moveTank);*/
         inputHandler = new InputHandler(player, networkManager, tiledMap);
         collisionDetector = new CollisionDetector(this);
     }
@@ -170,9 +182,11 @@ public class GameScreen extends ScreenAdapter {
     public void render(float delta) {
         super.render(delta);
         clearScreen();
-        if (!gameOver) {
-            inputHandler.queryInput();
+        if (gameOver) {
+            System.out.println("GAME OVER!!!");
+            game.setScreen(new StartScreen(game));
         }
+        inputHandler.queryInput();
         updateAllBullets();
         collisionDetector.checkCollisions();
 
@@ -268,5 +282,13 @@ public class GameScreen extends ScreenAdapter {
     private void clearScreen() {
         Gdx.gl.glClearColor(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, Color.BLACK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+    public int getNextLevelScore() {
+        return nextLevelScore;
+    }
+
+    public void setNextLevelScore(int nextLevelScore) {
+        this.nextLevelScore = nextLevelScore;
     }
 }

@@ -8,4 +8,6 @@ public class CreatePlayer {
     public float x;
     public float y;
     public float rotation;
+    public int level;
+    public int healthPoints;
 }

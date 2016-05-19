@@ -61,8 +61,13 @@ public class NetworkManager {
                 else if (o instanceof CreatePlayer) {
                     CreatePlayer newPlayer = (CreatePlayer) o;
                     Tank newTank = new Tank(ENEMY_TANK_TEXTURE, newPlayer.x, newPlayer.y, newPlayer.rotation);
-                    newTank.ID = newPlayer.id;
+                    newTank.setLevel(newPlayer.level);
+                    newTank.setHealthPoints(newPlayer.healthPoints);
                     enemies.put(newPlayer.id, newTank);
+
+                    for (Integer key : enemies.keySet()) {
+                        System.out.println("KEY: " + key + " enemy: " + enemies.get(key));
+                    }
                 }
                 else if (o instanceof ShootTank) {
                     ShootTank shootTank = (ShootTank) o;
@@ -78,6 +83,9 @@ public class NetworkManager {
                 else if (o instanceof HitTank) {
                     HitTank hitTank = (HitTank) o;
                     enemies.get(hitTank.id).subHealthPoints(hitTank.damage);
+                    if (enemies.get(hitTank.id).isDead()) {
+                        enemies.remove(hitTank.id);
+                    }
                 }
             }
         };

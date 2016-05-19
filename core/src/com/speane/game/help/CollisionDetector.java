@@ -7,6 +7,7 @@ import com.speane.game.entities.Bullet;
 import com.speane.game.entities.GameObject;
 import com.speane.game.entities.Tank;
 import com.speane.game.screens.GameScreen;
+import com.speane.game.transfers.DeadTank;
 import com.speane.game.transfers.HitTank;
 
 import java.util.Iterator;
@@ -18,14 +19,14 @@ import java.util.Map;
 public class CollisionDetector {
     private Tank player;
     private Map<Integer, Tank> enemies;
-    private GameScore score;
+    private GameScreen gameScreen;
     private NetworkManager networkManager;
 
     public CollisionDetector(GameScreen gameScreen) {
         this.player = gameScreen.getPlayer();
         this.enemies = gameScreen.getEnemies();
-        this.score = gameScreen.getScore();
-        this.networkManager = gameScreen.;
+        this.networkManager = gameScreen.getNetworkManager();
+        this.gameScreen = gameScreen;
     }
 
     public static boolean collidesWithLayer(TiledMapTileLayer layer, Rectangle collisionModel) {
@@ -63,6 +64,8 @@ public class CollisionDetector {
                     bulletIterator.remove();
                     enemy.hit(player);
                     if (player.isDead()) {
+                        networkManager.sendEvent(new DeadTank());
+                        gameScreen.setGameOver(true);
                         return;
                     }
                     else {
@@ -76,11 +79,18 @@ public class CollisionDetector {
             while (playerBulletIterator.hasNext()) {
                 Bullet bullet = playerBulletIterator.next();
                 if (isCollision(bullet, enemy)) {
-                    player.hit(enemy);
-                    score.upScore((int) (Config.SCORE_FOR_HIT / ((double) player.getLevel() / enemy.getLevel())));
+                    int oldScore = gameScreen.getScore();
+                    gameScreen.setScore(oldScore
+                            + ((int) (Config.SCORE_FOR_HIT / ((double) player.getLevel() / enemy.getLevel()))));
                     playerBulletIterator.remove();
                     if (enemy.isDead()) {
-                        score.upScore((int) (Config.SCORE_FOR_KILL / ((double) player.getLevel() / enemy.getLevel())));
+                        gameScreen.setScore(oldScore +
+                                ((int) (Config.SCORE_FOR_KILL / ((double) player.getLevel() / enemy.getLevel()))));
+                    }
+                    gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() + gameScreen.getScore() - oldScore);
+                    if (gameScreen.getNextLevelScore() > Config.LEVEL_UP_SCORE) {
+                        player.levelUp(gameScreen.getNextLevelScore() / Config.LEVEL_UP_SCORE);
+                        gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() % Config.LEVEL_UP_SCORE);
                     }
                 }
             }
