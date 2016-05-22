@@ -9,6 +9,7 @@ import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.entities.network.transfers.MoveTank;
 import com.speane.game.entities.network.transfers.ShootTank;
+import com.speane.game.screens.GameScreen;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.
@@ -17,9 +18,11 @@ public class InputHandler {
     private Tank tank;
     private NetworkManager networkManager;
     private TiledMap tiledMap;
+    private GameScreen gameScreen;
 
-    public InputHandler(Tank tank, NetworkManager networkManager, TiledMap tiledMap) {
+    public InputHandler(Tank tank, NetworkManager networkManager, TiledMap tiledMap, GameScreen gameScreen) {
         this.tank = tank;
+        this.gameScreen = gameScreen;
         this.networkManager = networkManager;
         this.tiledMap = tiledMap;
     }
@@ -30,11 +33,17 @@ public class InputHandler {
         int oldX = tank.getX();
         int oldY = tank.getY();
 
+        boolean escPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
         boolean lPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
         boolean uPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
         boolean dPressed = Gdx.input.isKeyPressed(Input.Keys.DOWN);
         boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
+
+        if (escPressed) {
+            gameScreen.setGameOver(true);
+            return;
+        }
 
         if (lPressed) {
             tank.rotate(Direction.LEFT);

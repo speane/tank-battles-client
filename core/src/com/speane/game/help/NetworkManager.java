@@ -70,7 +70,7 @@ public class NetworkManager {
                     newTank.setLevel(newPlayer.level);
                     newTank.setHealthPoints(newPlayer.healthPoints);
                     enemies.put(newPlayer.id, newTank);
-
+                    gameScreen.getPlayerNames().put(newPlayer.id, newPlayer.name);
                     for (Integer key : enemies.keySet()) {
                         System.out.println("KEY: " + key + " enemy: " + enemies.get(key));
                     }
@@ -131,5 +131,9 @@ public class NetworkManager {
 
     public void move(MoveTank moveTank) {
         client.sendTCP(moveTank);
+    }
+
+    public void close() {
+        client.close();
     }
 }

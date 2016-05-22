@@ -10,4 +10,5 @@ public class CreatePlayer {
     public float rotation;
     public int level;
     public int healthPoints;
+    public String name;
 }

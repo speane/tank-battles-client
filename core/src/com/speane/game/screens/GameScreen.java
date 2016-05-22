@@ -48,6 +48,7 @@ public class GameScreen extends ScreenAdapter {
     private InputHandler inputHandler;
     private CollisionDetector collisionDetector;
     private String playerName;
+    private HashMap<Integer, String> playerNames;
     private TankGame game;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
@@ -87,6 +88,7 @@ public class GameScreen extends ScreenAdapter {
         this.game = game;
         this.userInfo = userInfo;
         playerName = game.getPlayerName();
+        playerNames = new HashMap<>();
     }
 
     public void addScore(int deltaScore) {
@@ -187,13 +189,14 @@ public class GameScreen extends ScreenAdapter {
         createPlayer.healthPoints = player.getHealthPoints();
         createPlayer.level = player.getLevel();
         createPlayer.rotation = player.getRotation();
+        createPlayer.name = userInfo.name;
         networkManager.sendEvent(createPlayer);
         /*MoveTank moveTank = new MoveTank();
         moveTank.rotation = player.getRotation();
         moveTank.x = player.getX();
         moveTank.y = player.getY();
         networkManager.move(moveTank);*/
-        inputHandler = new InputHandler(player, networkManager, tiledMap);
+        inputHandler = new InputHandler(player, networkManager, tiledMap, this);
         collisionDetector = new CollisionDetector(this);
     }
 
@@ -203,6 +206,7 @@ public class GameScreen extends ScreenAdapter {
         clearScreen();
         if (gameOver) {
             System.out.println("GAME OVER!!!");
+            networkManager.close();
             game.setScreen(new GameOverScreen(game, userInfo, score));
         }
         inputHandler.queryInput();
@@ -272,7 +276,7 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
 
         drawEnemies();
-        drawTank(player, TANK_TEXTURE);
+        drawTank(player, TANK_TEXTURE, userInfo.name);
         renderer.drawText("Health: " + player.getHealthPoints(),
                 (int) (camera.position.x - Config.DESKTOP_SCREEN_WIDTH / 2),
                 (int) (camera.position.y + Config.DESKTOP_SCREEN_HEIGHT / 2));
@@ -282,20 +286,26 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
     }
 
-    private void drawTank(Tank tank, TextureRegion texture) {
+    private void drawTank(Tank tank, TextureRegion texture, String playerName) {
         renderer.draw(tank, texture);
         renderer.drawText("[" + tank.getLevel() + " lvl] " + tank.getHealthPoints() + "hp",
                 tank.getX() - 10,
                 (int) (tank.getY() + tank.getCollisionModel().getHeight() + 30));
+        renderer.drawText(playerName,
+                tank.getX() - 10,
+                (int) (tank.getY() + tank.getCollisionModel().getHeight() + 50));
         for (Bullet bullet : tank.getBullets()) {
             renderer.draw(bullet, BULLET_TEXTURE);
         }
     }
 
     private void drawEnemies() {
-        for (Tank enemy : enemies.values()) {
-            drawTank(enemy, ENEMY_TANK_TEXTURE);
+        for (Integer key : enemies.keySet()) {
+            drawTank(enemies.get(key), ENEMY_TANK_TEXTURE, playerNames.get(key));
         }
+        /*for (Tank enemy : enemies.values()) {
+            drawTank(enemy, ENEMY_TANK_TEXTURE, playerNames.get(key));
+        }*/
     }
 
     private void clearScreen() {
@@ -309,5 +319,9 @@ public class GameScreen extends ScreenAdapter {
 
     public void setNextLevelScore(int nextLevelScore) {
         this.nextLevelScore = nextLevelScore;
+    }
+
+    public HashMap getPlayerNames() {
+        return playerNames;
     }
 }
