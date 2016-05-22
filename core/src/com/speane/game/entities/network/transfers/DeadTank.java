@@ -1,4 +1,4 @@
-package com.speane.game.transfers;
+package com.speane.game.entities.network.transfers;
 
 /**
  * Created by Evgeny Shilov on 05.04.2016.

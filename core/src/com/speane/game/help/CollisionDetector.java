@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.GameObject;
 import com.speane.game.entities.Tank;
+import com.speane.game.entities.network.transfers.DeadTank;
+import com.speane.game.entities.network.transfers.HitTank;
 import com.speane.game.screens.GameScreen;
-import com.speane.game.transfers.DeadTank;
-import com.speane.game.transfers.HitTank;
 
 import java.util.Iterator;
 import java.util.Map;

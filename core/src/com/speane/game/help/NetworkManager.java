@@ -7,8 +7,8 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
+import com.speane.game.entities.network.transfers.*;
 import com.speane.game.screens.GameScreen;
-import com.speane.game.transfers.*;
 
 import java.io.IOException;
 import java.util.Map;

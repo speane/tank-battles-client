@@ -7,8 +7,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
-import com.speane.game.transfers.MoveTank;
-import com.speane.game.transfers.ShootTank;
+import com.speane.game.entities.network.transfers.MoveTank;
+import com.speane.game.entities.network.transfers.ShootTank;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.

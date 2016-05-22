@@ -17,9 +17,9 @@ import com.speane.game.TankGame;
 import com.speane.game.entities.Bullet;
 import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
+import com.speane.game.entities.network.transfers.CreatePlayer;
+import com.speane.game.entities.network.transfers.LevelUp;
 import com.speane.game.help.*;
-import com.speane.game.transfers.CreatePlayer;
-import com.speane.game.transfers.LevelUp;
 
 import java.util.HashMap;
 import java.util.Iterator;
