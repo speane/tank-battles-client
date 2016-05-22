@@ -12,7 +12,10 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
 import com.speane.game.entities.network.authentication.AuthenticationManager;
+import com.speane.game.entities.network.userinfo.UserInfo;
 import com.speane.game.help.Config;
+
+import java.io.IOException;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
@@ -58,7 +61,7 @@ public class RegistrationScreen extends ScreenAdapter {
 
     private void addStatusLabel() {
         statusLabel = new Label(EMPTY_STRING, skin);
-        statusLabel.setPosition(DESKTOP_SCREEN_WIDTH / 2 - INDENT * 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 5, Align.center);
+        statusLabel.setPosition(DESKTOP_SCREEN_WIDTH / 2 - INDENT * 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 3, Align.center);
         stage.addActor(statusLabel);
     }
 
@@ -124,7 +127,7 @@ public class RegistrationScreen extends ScreenAdapter {
         registerButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-                /*String login = loginTextField.getText();
+                String login = loginTextField.getText();
                 String firstPassword = firstPasswordField.getText();
                 String secondPassword = secondPasswordField.getText();
                 String email = emailTextField.getText();
@@ -132,9 +135,12 @@ public class RegistrationScreen extends ScreenAdapter {
                     if (firstPassword.equals(secondPassword)) {
                         try {
                             UserInfo userInfo = authenticationManager.register(login, firstPassword, email);
-                            if (userInfo != null) {*/
+                            if (userInfo != null) {
                                 game.setScreen(new AcceptRegistrationScreen(game));
-                            /*}
+                            }
+                            else {
+                                statusLabel.setText("Wrong data input");
+                            }
                         } catch (IOException e) {
                             statusLabel.setText("Can't connect to server");
                         }
@@ -145,7 +151,7 @@ public class RegistrationScreen extends ScreenAdapter {
                 }
                 else {
                     statusLabel.setText("Enter all data fields");
-                }*/
+                }
             }
         });
         stage.addActor(registerButton);

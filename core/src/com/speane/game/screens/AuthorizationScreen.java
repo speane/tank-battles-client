@@ -104,6 +104,9 @@ public class AuthorizationScreen extends ScreenAdapter {
                         game.setScreen(new StartScreen(game, userInfo));
                         dispose();
                     }
+                    else {
+                        statusLabel.setText("Wrong login or password");
+                    }
                 } catch (IOException e) {
                     statusLabel.setText(CONNECTION_ERROR_TEXT_MESSAGE);
                 }

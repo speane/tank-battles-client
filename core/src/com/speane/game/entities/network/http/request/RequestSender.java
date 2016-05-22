@@ -39,7 +39,7 @@ public class RequestSender {
 
     public void sendAuthorizationRequest(AuthorizationRequest request) throws IOException {
         HttpRequest httpRequest = new HttpRequest();
-        httpRequest.setRequestLine(new RequestLine("POST /authentication HTTP/1.1"));
+        httpRequest.setRequestLine(new RequestLine("POST /authorization HTTP/1.1"));
         httpRequest.getHeaders().put("Host", socket.getInetAddress().getHostName());
         httpRequest.getHeaders().put("Connection", "Close");
         LoginInfo loginInfo = new LoginInfo();
@@ -51,7 +51,7 @@ public class RequestSender {
 
     public void sendRegistrationRequest(RegistrationInfo registrationInfo) throws IOException {
         HttpRequest httpRequest = new HttpRequest();
-        httpRequest.setRequestLine(new RequestLine("POST /register HTTP/1.1"));
+        httpRequest.setRequestLine(new RequestLine("POST /registration HTTP/1.1"));
         httpRequest.getHeaders().put("Host", socket.getInetAddress().getHostName());
         httpRequest.getHeaders().put("Connection", "Close");
         httpRequest.setMessageBody(gsonSerializer.toJson(registrationInfo).getBytes(Charset.forName("utf-8")));
