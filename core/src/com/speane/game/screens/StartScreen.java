@@ -9,12 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
+import com.speane.game.entities.network.userinfo.UserInfo;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
@@ -26,9 +26,11 @@ import static com.speane.game.help.TextureManager.*;
 public class StartScreen extends ScreenAdapter {
     private Stage stage;
     private TankGame game;
+    private UserInfo userInfo;
 
-    public StartScreen(TankGame game) {
+    public StartScreen(TankGame game, UserInfo userInfo) {
         this.game = game;
+        this.userInfo = userInfo;
     }
 
     @Override
@@ -41,11 +43,6 @@ public class StartScreen extends ScreenAdapter {
         backgroundImage.setSize(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT);
         stage.addActor(backgroundImage);
 
-        final TextField textField = new TextField("", skin);
-        textField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - 100, Align.center);
-        textField.setMessageText("Enter your name");
-        stage.addActor(textField);
-
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.imageUp = new TextureRegionDrawable(PLAY_BUTTON_TEXTURE);
         style.imageOver = new TextureRegionDrawable(PLAY_BUTTON_PRESSED_TEXTURE);
@@ -56,8 +53,7 @@ public class StartScreen extends ScreenAdapter {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 super.tap(event, x, y, count, button);
-                game.setPlayerName(textField.getText());
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameScreen(game, userInfo));
                 dispose();
             }
         });

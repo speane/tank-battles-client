@@ -5,6 +5,7 @@ package com.speane.game.help;
  */
 public class Config {
     public static String SERVER_HOST = "localhost";
+    public static int PLAY_PORT = 7777;
     public static int SERVER_PORT = 8080;
     public static int DESKTOP_SCREEN_WIDTH = 800;
     public static int DESKTOP_SCREEN_HEIGHT = 600;

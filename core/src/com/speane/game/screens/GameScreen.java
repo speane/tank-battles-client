@@ -19,6 +19,7 @@ import com.speane.game.entities.Tank;
 import com.speane.game.entities.moving.Direction;
 import com.speane.game.entities.network.transfers.CreatePlayer;
 import com.speane.game.entities.network.transfers.LevelUp;
+import com.speane.game.entities.network.userinfo.UserInfo;
 import com.speane.game.help.*;
 
 import java.util.HashMap;
@@ -52,6 +53,7 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private float levelWidth;
     private float levelHeight;
+    private UserInfo userInfo;
 
     public int getScore() {
         return score;
@@ -81,8 +83,9 @@ public class GameScreen extends ScreenAdapter {
         return enemies;
     }
 
-    public GameScreen(TankGame game) {
+    public GameScreen(TankGame game, UserInfo userInfo) {
         this.game = game;
+        this.userInfo = userInfo;
         playerName = game.getPlayerName();
     }
 

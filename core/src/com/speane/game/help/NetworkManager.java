@@ -36,7 +36,7 @@ public class NetworkManager {
         registerClasses();
         new Thread(client).start();
         try {
-            client.connect(CLIENT_WAIT_TIMEOUT, SERVER_HOST, SERVER_PORT);
+            client.connect(CLIENT_WAIT_TIMEOUT, SERVER_HOST, PLAY_PORT);
         } catch (IOException e) {
             System.out.println(CONNECTION_FAILED_MESSAGE);
         }

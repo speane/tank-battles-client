@@ -12,19 +12,16 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
 import com.speane.game.entities.network.authentication.AuthenticationManager;
-import com.speane.game.entities.network.userinfo.UserInfo;
 import com.speane.game.help.Config;
-
-import java.io.IOException;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
 import static com.speane.game.help.TextureManager.START_MENU_BACKGROUND_TEXTURE;
 
 /**
- * Created by Evgeny Shilov on 19.05.2016.
+ * Created by Evgeny Shilov on 22.05.2016.
  */
-public class AuthorizationScreen extends ScreenAdapter {
+public class RegistrationScreen extends ScreenAdapter {
     private final int FIELD_WIDTH = 150;
     private final int FIELD_HEIGHT = 30;
     private final int INDENT = 50;
@@ -35,12 +32,15 @@ public class AuthorizationScreen extends ScreenAdapter {
     private TankGame game;
 
     private TextField loginTextField;
-    private TextField passwordTextField;
+    private TextField firstPasswordField;
+    private TextField secondPasswordField;
+    private TextField emailTextField;
+
     private Label statusLabel;
 
     private AuthenticationManager authorizationManager;
 
-    public AuthorizationScreen(TankGame game) {
+    public RegistrationScreen(TankGame game) {
         this.game = game;
         String SKIN_FILE_PATH = "data/uiskin.json";
         this.skin = new Skin(Gdx.files.internal(SKIN_FILE_PATH));
@@ -77,14 +77,30 @@ public class AuthorizationScreen extends ScreenAdapter {
         loginTextField.setMessageText(LOGIN_FIELD_TEXT);
         stage.addActor(loginTextField);
 
-        passwordTextField = new TextField(EMPTY_STRING, skin);
-        passwordTextField.setPasswordMode(true);
-        passwordTextField.setPasswordCharacter('*');
-        passwordTextField.setSize(FIELD_WIDTH, FIELD_HEIGHT);
-        passwordTextField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
-        String PASSWORD_FIELD_TEXT = "Password";
-        passwordTextField.setMessageText(PASSWORD_FIELD_TEXT);
-        stage.addActor(passwordTextField);
+        emailTextField = new TextField(EMPTY_STRING, skin);
+        emailTextField.setSize(FIELD_WIDTH, FIELD_HEIGHT);
+        emailTextField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
+        String EMAIL_FIELD_TEXT = "e-mail";
+        emailTextField.setMessageText(EMAIL_FIELD_TEXT);
+        stage.addActor(emailTextField);
+
+        firstPasswordField = new TextField(EMPTY_STRING, skin);
+        firstPasswordField.setPasswordMode(true);
+        firstPasswordField.setPasswordCharacter('*');
+        firstPasswordField.setSize(FIELD_WIDTH, FIELD_HEIGHT);
+        firstPasswordField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT, Align.center);
+        String PASSWORD_FIELD_TEXT = "Enter password";
+        firstPasswordField.setMessageText(PASSWORD_FIELD_TEXT);
+        stage.addActor(firstPasswordField);
+
+        secondPasswordField = new TextField(EMPTY_STRING, skin);
+        secondPasswordField.setPasswordMode(true);
+        secondPasswordField.setPasswordCharacter('*');
+        secondPasswordField.setSize(FIELD_WIDTH, FIELD_HEIGHT);
+        secondPasswordField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 2, Align.center);
+        String REPEAT_PASSWORD_FIELD_TEXT = "Confirm password";
+        secondPasswordField.setMessageText(REPEAT_PASSWORD_FIELD_TEXT);
+        stage.addActor(secondPasswordField);
     }
 
     private void addButtons() {
@@ -92,36 +108,27 @@ public class AuthorizationScreen extends ScreenAdapter {
 
         TextButton authorizeButton = new TextButton(AUTHORIZE_BUTTON_TEXT, skin);
         authorizeButton.setSize(FIELD_WIDTH, FIELD_HEIGHT);
-        authorizeButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 2, Align.center);
+        authorizeButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 5, Align.center);
         authorizeButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-                try {
-                    UserInfo userInfo = authorizationManager.authorize(loginTextField.getText(),
-                            passwordTextField.getText());
-                    if (userInfo != null) {
-                        statusLabel.setText("CONNECTED: " + userInfo.name);
-                        game.setScreen(new StartScreen(game, userInfo));
-                        dispose();
-                    }
-                } catch (IOException e) {
-                    statusLabel.setText(CONNECTION_ERROR_TEXT_MESSAGE);
-                }
+                game.setScreen(new AuthorizationScreen(game));
+                dispose();
             }
         });
         String REGISTER_BUTTON_TEXT = "Register";
         TextButton registerButton = new TextButton(REGISTER_BUTTON_TEXT, skin);
         registerButton.setSize(FIELD_WIDTH, FIELD_HEIGHT);
         registerButton.setPosition(DESKTOP_SCREEN_WIDTH / 2,
-                DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 3, Align.center);
+                DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 4, Align.center);
         registerButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-                game.setScreen(new RegistrationScreen(game));
+
             }
         });
-        stage.addActor(authorizeButton);
         stage.addActor(registerButton);
+        stage.addActor(authorizeButton);
     }
 
     @Override
