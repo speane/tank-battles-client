@@ -99,6 +99,7 @@ public class AuthorizationScreen extends ScreenAdapter {
                 try {
                     UserInfo userInfo = authorizationManager.authorize(loginTextField.getText(),
                             passwordTextField.getText());
+                    System.out.println(userInfo);
                     if (userInfo != null) {
                         statusLabel.setText("CONNECTED: " + userInfo.name);
                     }
