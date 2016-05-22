@@ -5,4 +5,6 @@ package com.speane.game.entities.network.userinfo;
  */
 public class UserInfo {
     public String name;
+    public int battlesPlayed;
+    public int bestScore;
 }

@@ -55,4 +55,16 @@ public class AuthenticationManager {
             return null;
         }
     }
+
+    public UserInfo updateInfo(UserInfo userInfo) throws IOException {
+        Socket server = new Socket(host, port);
+        new RequestSender(server).sendUpdateRequest(userInfo);
+        HttpResponse response = new ResponseReceiver(server).getNextResponse();
+        if (response.getStatusLine().getStatusCode().equals(SUCCESS_STATUS_CODE)) {
+            return gsonSerializer.fromJson(new String(response.getMessageBody()), UserInfo.class);
+        }
+        else {
+            return null;
+        }
+    }
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -43,12 +44,32 @@ public class StartScreen extends ScreenAdapter {
         backgroundImage.setSize(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT);
         stage.addActor(backgroundImage);
 
+        Label userNameLabel = new Label(userInfo.name, skin);
+        userNameLabel.setFontScale(2);
+        userNameLabel.setPosition(DESKTOP_SCREEN_WIDTH / 2 - 40, DESKTOP_SCREEN_HEIGHT / 2 + 60, Align.center);
+        stage.addActor(userNameLabel);
+
+        Label battlesPlayedLabel = new Label("Battles played: " + userInfo.battlesPlayed, skin);
+        battlesPlayedLabel.setPosition(20, DESKTOP_SCREEN_HEIGHT / 2 + 30);
+        battlesPlayedLabel.setFontScale(1.5f);
+        stage.addActor(battlesPlayedLabel);
+
+        Label bestLabel = new Label("Best: " + userInfo.bestScore + " points", skin);
+        bestLabel.setPosition(20, DESKTOP_SCREEN_HEIGHT / 2);
+        bestLabel.setFontScale(1.5f);
+        stage.addActor(bestLabel);
+
+        Image tankSkinImage = new Image(TANK_TEXTURE);
+        tankSkinImage.setPosition(DESKTOP_SCREEN_WIDTH / 2 - 50, DESKTOP_SCREEN_HEIGHT / 2 - 75, Align.center);
+        tankSkinImage.setSize(DESKTOP_SCREEN_WIDTH / 5, DESKTOP_SCREEN_HEIGHT / 5);
+        stage.addActor(tankSkinImage);
+
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.imageUp = new TextureRegionDrawable(PLAY_BUTTON_TEXTURE);
         style.imageOver = new TextureRegionDrawable(PLAY_BUTTON_PRESSED_TEXTURE);
 
         ImageButton imageButton = new ImageButton(style);
-        imageButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
+        imageButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - 200, Align.center);
         imageButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {

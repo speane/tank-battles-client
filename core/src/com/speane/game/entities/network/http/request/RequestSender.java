@@ -3,6 +3,7 @@ package com.speane.game.entities.network.http.request;
 import com.google.gson.Gson;
 import com.speane.game.entities.network.userinfo.LoginInfo;
 import com.speane.game.entities.network.userinfo.RegistrationInfo;
+import com.speane.game.entities.network.userinfo.UserInfo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -55,6 +56,15 @@ public class RequestSender {
         httpRequest.getHeaders().put("Host", socket.getInetAddress().getHostName());
         httpRequest.getHeaders().put("Connection", "Close");
         httpRequest.setMessageBody(gsonSerializer.toJson(registrationInfo).getBytes(Charset.forName("utf-8")));
+        sendRequest(httpRequest);
+    }
+
+    public void sendUpdateRequest(UserInfo userInfo) throws IOException {
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setRequestLine(new RequestLine("POST /updateuserinfo HTTP/1.1"));
+        httpRequest.getHeaders().put("Host", socket.getInetAddress().getHostName());
+        httpRequest.getHeaders().put("Connection", "Close");
+        httpRequest.setMessageBody(gsonSerializer.toJson(userInfo).getBytes(Charset.forName("utf-8")));
         sendRequest(httpRequest);
     }
 }
