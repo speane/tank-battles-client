@@ -8,7 +8,13 @@ import java.net.Socket;
  * Created by Evgeny Shilov on 15.05.2016.
  */
 public class ResponseReceiver {
-    public HttpResponse getNextResponse(Socket server) throws IOException {
+    private Socket server;
+
+    public ResponseReceiver(Socket socket) {
+        this.server = socket;
+    }
+
+    public HttpResponse getNextResponse() throws IOException {
         DataInputStream dataInputStream = new DataInputStream(server.getInputStream());
         HttpResponse httpResponse = new HttpResponse();
         String tempLine = dataInputStream.readUTF();

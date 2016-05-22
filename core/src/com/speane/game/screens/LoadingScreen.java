@@ -64,7 +64,7 @@ public class LoadingScreen extends ScreenAdapter {
         if (game.getAssetManager().update()) {
             TextureAtlas textureAtlas = game.getAssetManager().get("textures/archive/tank_battles_assets.atlas");
             TextureManager.init(textureAtlas);
-            game.setScreen(new StartScreen(game));
+            game.setScreen(new AuthorizationScreen(game));
         } else {
             progress = game.getAssetManager().getProgress();
         }

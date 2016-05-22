@@ -6,14 +6,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
+import com.speane.game.entities.network.authorization.AuthorizationManager;
+import com.speane.game.entities.network.userinfo.UserInfo;
+import com.speane.game.help.Config;
+
+import java.io.IOException;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
@@ -23,48 +25,102 @@ import static com.speane.game.help.TextureManager.START_MENU_BACKGROUND_TEXTURE;
  * Created by Evgeny Shilov on 19.05.2016.
  */
 public class AuthorizationScreen extends ScreenAdapter {
+    private final int FIELD_WIDTH = 150;
+    private final int FIELD_HEIGHT = 30;
+    private final int INDENT = 50;
+    private final String CONNECTION_ERROR_TEXT_MESSAGE = "Can't connect to server";
+    private final String EMPTY_STRING = "";
+    private Skin skin;
     private Stage stage;
     private TankGame game;
 
+    private TextField loginTextField;
+    private TextField passwordTextField;
+    private Label statusLabel;
+
+    private AuthorizationManager authorizationManager;
+
     public AuthorizationScreen(TankGame game) {
         this.game = game;
+        String SKIN_FILE_PATH = "data/uiskin.json";
+        this.skin = new Skin(Gdx.files.internal(SKIN_FILE_PATH));
+        this.stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
+        authorizationManager = new AuthorizationManager(Config.SERVER_HOST, Config.SERVER_PORT);
     }
 
     @Override
     public void show() {
-        Skin skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+        addBackground();
+        addInputFields();
+        addButtons();
+        addStatusLabel();
+    }
 
-        stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
+    private void addStatusLabel() {
+        statusLabel = new Label(EMPTY_STRING, skin);
+        statusLabel.setPosition(DESKTOP_SCREEN_WIDTH / 2 - INDENT * 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 5, Align.center);
+        stage.addActor(statusLabel);
+    }
+
+    private void addBackground() {
         Gdx.input.setInputProcessor(stage);
         Image backgroundImage = new Image(START_MENU_BACKGROUND_TEXTURE);
         backgroundImage.setSize(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT);
         stage.addActor(backgroundImage);
+    }
 
-        final TextField textField = new TextField("", skin);
-        textField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - 100, Align.center);
-        textField.setMessageText("Enter your name");
-        stage.addActor(textField);
+    private void addInputFields() {
+        loginTextField = new TextField(EMPTY_STRING, skin);
+        loginTextField.setSize(FIELD_WIDTH, FIELD_HEIGHT);
+        loginTextField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 + INDENT, Align.center);
+        String LOGIN_FIELD_TEXT = "Login";
+        loginTextField.setMessageText(LOGIN_FIELD_TEXT);
+        stage.addActor(loginTextField);
 
-        TextButton authorizeButton = new TextButton("Authorize", skin);
-        authorizeButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
+        passwordTextField = new TextField(EMPTY_STRING, skin);
+        passwordTextField.setPasswordMode(true);
+        passwordTextField.setPasswordCharacter('*');
+        passwordTextField.setSize(FIELD_WIDTH, FIELD_HEIGHT);
+        passwordTextField.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2, Align.center);
+        String PASSWORD_FIELD_TEXT = "Password";
+        passwordTextField.setMessageText(PASSWORD_FIELD_TEXT);
+        stage.addActor(passwordTextField);
+    }
+
+    private void addButtons() {
+        String AUTHORIZE_BUTTON_TEXT = "Authorize";
+
+        TextButton authorizeButton = new TextButton(AUTHORIZE_BUTTON_TEXT, skin);
+        authorizeButton.setSize(FIELD_WIDTH, FIELD_HEIGHT);
+        authorizeButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 2, Align.center);
         authorizeButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-                System.out.println("AUTHORIZE");
-                dispose();
+                try {
+                    UserInfo userInfo = authorizationManager.authorize(loginTextField.getText(),
+                            passwordTextField.getText());
+                    if (userInfo != null) {
+                        statusLabel.setText("CONNECTED: " + userInfo.name);
+                    }
+                } catch (IOException e) {
+                    statusLabel.setText(CONNECTION_ERROR_TEXT_MESSAGE);
+                }
+                System.out.println("Authorize");
             }
         });
-        TextButton registerButton = new TextButton("Register", skin);
+        String REGISTER_BUTTON_TEXT = "Register";
+        TextButton registerButton = new TextButton(REGISTER_BUTTON_TEXT, skin);
+        registerButton.setSize(FIELD_WIDTH, FIELD_HEIGHT);
         registerButton.setPosition(DESKTOP_SCREEN_WIDTH / 2,
-                DESKTOP_SCREEN_HEIGHT / 2 - registerButton.getHeight() - 5, Align.center);
+                DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 3, Align.center);
         registerButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-                System.out.println("REGISTER");
-                dispose();
+                System.out.println("Register");
             }
         });
         stage.addActor(authorizeButton);
+        stage.addActor(registerButton);
     }
 
     @Override
