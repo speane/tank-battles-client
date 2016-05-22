@@ -38,14 +38,14 @@ public class RegistrationScreen extends ScreenAdapter {
 
     private Label statusLabel;
 
-    private AuthenticationManager authorizationManager;
+    private AuthenticationManager authenticationManager;
 
     public RegistrationScreen(TankGame game) {
         this.game = game;
         String SKIN_FILE_PATH = "data/uiskin.json";
         this.skin = new Skin(Gdx.files.internal(SKIN_FILE_PATH));
         this.stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
-        authorizationManager = new AuthenticationManager(Config.SERVER_HOST, Config.SERVER_PORT);
+        authenticationManager = new AuthenticationManager(Config.SERVER_HOST, Config.SERVER_PORT);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class RegistrationScreen extends ScreenAdapter {
     private void addButtons() {
         String AUTHORIZE_BUTTON_TEXT = "Authorize";
 
-        TextButton authorizeButton = new TextButton(AUTHORIZE_BUTTON_TEXT, skin);
+        final TextButton authorizeButton = new TextButton(AUTHORIZE_BUTTON_TEXT, skin);
         authorizeButton.setSize(FIELD_WIDTH, FIELD_HEIGHT);
         authorizeButton.setPosition(DESKTOP_SCREEN_WIDTH / 2, DESKTOP_SCREEN_HEIGHT / 2 - INDENT * 5, Align.center);
         authorizeButton.addListener(new ActorGestureListener() {
@@ -124,7 +124,28 @@ public class RegistrationScreen extends ScreenAdapter {
         registerButton.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
-
+                /*String login = loginTextField.getText();
+                String firstPassword = firstPasswordField.getText();
+                String secondPassword = secondPasswordField.getText();
+                String email = emailTextField.getText();
+                if (!(login.isEmpty() || firstPassword.isEmpty() || secondPassword.isEmpty() || email.isEmpty())) {
+                    if (firstPassword.equals(secondPassword)) {
+                        try {
+                            UserInfo userInfo = authenticationManager.register(login, firstPassword, email);
+                            if (userInfo != null) {*/
+                                game.setScreen(new AcceptRegistrationScreen(game));
+                            /*}
+                        } catch (IOException e) {
+                            statusLabel.setText("Can't connect to server");
+                        }
+                    }
+                    else {
+                        statusLabel.setText("Passwords are not the same");
+                    }
+                }
+                else {
+                    statusLabel.setText("Enter all data fields");
+                }*/
             }
         });
         stage.addActor(registerButton);

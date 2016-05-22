@@ -38,14 +38,14 @@ public class AuthorizationScreen extends ScreenAdapter {
     private TextField passwordTextField;
     private Label statusLabel;
 
-    private AuthenticationManager authorizationManager;
+    private AuthenticationManager authenticationManager;
 
     public AuthorizationScreen(TankGame game) {
         this.game = game;
         String SKIN_FILE_PATH = "data/uiskin.json";
         this.skin = new Skin(Gdx.files.internal(SKIN_FILE_PATH));
         this.stage = new Stage(new FitViewport(DESKTOP_SCREEN_WIDTH, DESKTOP_SCREEN_HEIGHT));
-        authorizationManager = new AuthenticationManager(Config.SERVER_HOST, Config.SERVER_PORT);
+        authenticationManager = new AuthenticationManager(Config.SERVER_HOST, Config.SERVER_PORT);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class AuthorizationScreen extends ScreenAdapter {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 try {
-                    UserInfo userInfo = authorizationManager.authorize(loginTextField.getText(),
+                    UserInfo userInfo = authenticationManager.authorize(loginTextField.getText(),
                             passwordTextField.getText());
                     if (userInfo != null) {
                         statusLabel.setText("CONNECTED: " + userInfo.name);

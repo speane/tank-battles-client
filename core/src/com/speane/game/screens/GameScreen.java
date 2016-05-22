@@ -203,7 +203,7 @@ public class GameScreen extends ScreenAdapter {
         clearScreen();
         if (gameOver) {
             System.out.println("GAME OVER!!!");
-            game.setScreen(new StartScreen(game));
+            game.setScreen(new StartScreen(game, userInfo));
         }
         inputHandler.queryInput();
         updateAllBullets();
