@@ -5,6 +5,14 @@ package com.speane.game.entities.network.transfers;
  */
 public class DeadTank {
     public int id;
-    public int bulletNumber;
     public int killerID;
+
+    public DeadTank() {
+
+    }
+
+    public DeadTank(int id, int killerID) {
+        this.id = id;
+        this.killerID = killerID;
+    }
 }

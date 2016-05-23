@@ -7,4 +7,14 @@ public class HitTank {
     public int id;
     public int damage;
     public int shooterID;
+
+    public HitTank() {
+
+    }
+
+    public HitTank(int id, int damage, int shooterID) {
+        this.id = id;
+        this.damage = damage;
+        this.shooterID = shooterID;
+    }
 }

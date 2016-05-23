@@ -17,16 +17,13 @@ public class HttpMessage {
         return headers;
     }
 
-    public void setHeaders(HashMap<String, String> headers) {
-        this.headers = headers;
-    }
-
     public byte[] getMessageBody() {
         return messageBody;
     }
 
     public void setMessageBody(byte[] messageBody) {
+        String CONTENT_LENGTH_HEADER_NAME = "Content_Length";
         this.messageBody = messageBody;
-        headers.put("Content-Length", Integer.toString(messageBody.length));
+        headers.put(CONTENT_LENGTH_HEADER_NAME, Integer.toString(messageBody.length));
     }
 }

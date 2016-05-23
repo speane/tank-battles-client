@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
 import com.speane.game.entities.network.authentication.AuthenticationManager;
+import com.speane.game.entities.network.authentication.NoSuchUserException;
+import com.speane.game.entities.network.authentication.WrongPasswordException;
 import com.speane.game.entities.network.userinfo.UserInfo;
 import com.speane.game.help.Config;
 
@@ -109,6 +111,10 @@ public class AuthorizationScreen extends ScreenAdapter {
                     }
                 } catch (IOException e) {
                     statusLabel.setText(CONNECTION_ERROR_TEXT_MESSAGE);
+                } catch (WrongPasswordException e) {
+                    statusLabel.setText("Wrong password");
+                } catch (NoSuchUserException e) {
+                    statusLabel.setText("Wrong username");
                 }
             }
         });

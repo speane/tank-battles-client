@@ -11,4 +11,18 @@ public class CreatePlayer {
     public int level;
     public int healthPoints;
     public String name;
+
+    public CreatePlayer() {
+
+    }
+
+    public CreatePlayer(int id, float x, float y, float rotation, int level, int healthPoints, String name) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.rotation = rotation;
+        this.level = level;
+        this.healthPoints = healthPoints;
+        this.name = name;
+    }
 }

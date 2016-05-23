@@ -7,4 +7,14 @@ public class LevelUp {
     public int id;
     public int level;
     public int healthPoints;
+
+    public LevelUp() {
+
+    }
+
+    public LevelUp(int id, int level, int healthPoints) {
+        this.id = id;
+        this.level = level;
+        this.healthPoints = healthPoints;
+    }
 }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.speane.game.TankGame;
 import com.speane.game.entities.network.authentication.AuthenticationManager;
+import com.speane.game.entities.network.authentication.UserAlreadyExistsException;
 import com.speane.game.entities.network.userinfo.UserInfo;
 import com.speane.game.help.Config;
 
@@ -143,6 +144,8 @@ public class RegistrationScreen extends ScreenAdapter {
                             }
                         } catch (IOException e) {
                             statusLabel.setText("Can't connect to server");
+                        } catch (UserAlreadyExistsException e) {
+                            statusLabel.setText("User with this name already registered");
                         }
                     }
                     else {

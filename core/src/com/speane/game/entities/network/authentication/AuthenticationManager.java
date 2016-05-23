@@ -18,6 +18,7 @@ public class AuthenticationManager {
     private final String SUCCESS_STATUS_CODE = "200";
     private final String WRONG_LOGIN_CODE = "402";
     private final String WRONG_PASSWORD_CODE = "403";
+    private final String USER_EXISTS_CODE = "405";
     private String host;
     private int port;
     private Gson gsonSerializer;
@@ -41,23 +42,30 @@ public class AuthenticationManager {
                     throw new NoSuchUserException();
                 case WRONG_PASSWORD_CODE:
                     throw new WrongPasswordException();
+                default:
+                    return null;
             }
         }
     }
 
-    public UserInfo register(String login, String password, String email) throws IOException {
-        RegistrationInfo registrationInfo = new RegistrationInfo();
-        registrationInfo.login = login;
-        registrationInfo.password = password;
-        registrationInfo.email = email;
+    public UserInfo register(String login, String password, String email) throws IOException,
+            UserAlreadyExistsException {
+        RegistrationInfo registrationInfo = new RegistrationInfo(login, password, email);
+
         Socket server = new Socket(host, port);
         new RequestSender(server).sendRegistrationRequest(registrationInfo);
+
         HttpResponse response = new ResponseReceiver(server).getNextResponse();
         if (response.getStatusLine().getStatusCode().equals(SUCCESS_STATUS_CODE)) {
             return gsonSerializer.fromJson(new String(response.getMessageBody()), UserInfo.class);
         }
         else {
-            return null;
+            switch (response.getStatusLine().getStatusCode()) {
+                case USER_EXISTS_CODE:
+                    throw new UserAlreadyExistsException();
+                default:
+                    return null;
+            }
         }
     }
 
