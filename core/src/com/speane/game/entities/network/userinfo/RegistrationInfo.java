@@ -9,9 +9,11 @@ public class RegistrationInfo {
     public String email;
 
     public RegistrationInfo() {
-        login = "";
-        password = "";
-        email = "";
+        String EMPTY_STRING = "";
+
+        login = EMPTY_STRING;
+        password = EMPTY_STRING;
+        email = EMPTY_STRING;
     }
 
     public RegistrationInfo(String login, String password, String email) {

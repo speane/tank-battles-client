@@ -8,8 +8,10 @@ public class LoginInfo {
     public String password;
 
     public LoginInfo() {
-        userName = "";
-        password = "";
+        String EMPTY_STRING = "";
+
+        userName = EMPTY_STRING;
+        password = EMPTY_STRING;
     }
 
     public LoginInfo(String userName, String password) {

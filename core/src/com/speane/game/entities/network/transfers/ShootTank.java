@@ -8,4 +8,15 @@ public class ShootTank {
     public float rotation;
     public float x;
     public float y;
+
+    public ShootTank() {
+
+    }
+
+    public ShootTank(int id, float rotation, float x, float y) {
+        this.id = id;
+        this.rotation = rotation;
+        this.x = x;
+        this.y = y;
+    }
 }
