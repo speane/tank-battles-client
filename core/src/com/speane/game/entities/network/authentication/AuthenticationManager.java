@@ -16,10 +16,10 @@ import java.net.Socket;
  */
 public class AuthenticationManager {
     private final String SUCCESS_STATUS_CODE = "200";
-
+    private final String WRONG_LOGIN_CODE = "402";
+    private final String WRONG_PASSWORD_CODE = "403";
     private String host;
     private int port;
-
     private Gson gsonSerializer;
 
     public AuthenticationManager(String host, int port) {
@@ -28,15 +28,20 @@ public class AuthenticationManager {
         gsonSerializer = new Gson();
     }
 
-    public UserInfo authorize(String login, String password) throws IOException {
+    public UserInfo authorize(String login, String password) throws IOException, NoSuchUserException, WrongPasswordException {
         Socket serverSocket = new Socket(host, port);
         new RequestSender(serverSocket).sendAuthorizationRequest(new AuthorizationRequest(login, password));
         HttpResponse response = new ResponseReceiver(serverSocket).getNextResponse();
         if (response.getStatusLine().getStatusCode().equals(SUCCESS_STATUS_CODE)) {
-            return new Gson().fromJson(new String(response.getMessageBody()), UserInfo.class);
+            return gsonSerializer.fromJson(new String(response.getMessageBody()), UserInfo.class);
         }
         else {
-            return null;
+            switch (response.getStatusLine().getStatusCode()) {
+                case WRONG_LOGIN_CODE:
+                    throw new NoSuchUserException();
+                case WRONG_PASSWORD_CODE:
+                    throw new WrongPasswordException();
+            }
         }
     }
 

@@ -19,7 +19,7 @@ public class Renderer {
         font.setColor(Color.BLUE);
     }
 
-    public void drawText(String text, int x, int y) {
+    public void drawText(String text, float x, float y) {
         font.draw(batch, text, x, y);
     }
 

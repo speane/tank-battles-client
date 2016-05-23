@@ -51,6 +51,7 @@ public class NetworkManager {
         kryo.register(DeadTank.class);
         kryo.register(HitTank.class);
         kryo.register(LevelUp.class);
+        kryo.register(SendMessage.class);
     }
 
     private void initNetworkListener() {
@@ -80,6 +81,14 @@ public class NetworkManager {
                     Tank tank = enemies.get(shootTank.id);
                     tank.shoot(new Bullet(BULLET_TEXTURE, shootTank.x, shootTank.y, shootTank.rotation));
                     System.out.println("Shoot " + ((ShootTank) o).id);
+                }
+                else if (o instanceof SendMessage) {
+                    SendMessage sendMessage = (SendMessage) o;
+                    gameScreen.getChatMessages().addFirst(gameScreen.getPlayerNames().get(sendMessage.id)
+                            + ": " + sendMessage.message);
+                    if (gameScreen.getChatMessages().size > 5) {
+                        gameScreen.getChatMessages().removeLast();
+                    }
                 }
                 else if (o instanceof DeadTank) {
                     DeadTank deadTank = (DeadTank) o;
