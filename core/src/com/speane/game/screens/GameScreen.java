@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -36,7 +37,6 @@ import java.util.Map;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
-import static com.speane.game.help.TextureManager.TANK_TEXTURE;
 
 /**
  * Created by Speane on 08.03.2016.
@@ -65,12 +65,22 @@ public class GameScreen extends ScreenAdapter {
     private float levelWidth;
     private float levelHeight;
     private UserInfo userInfo;
+    private Skin skin;
 
     private Queue<String> chatMessages;
 
     private Stage stage;
     private TextField chatTextField;
     private TextButton sendButton;
+
+    public GameScreen(TankGame game, UserInfo userInfo) {
+        this.game = game;
+        this.userInfo = userInfo;
+        playerNames = new HashMap<>();
+        chatMessages = new Queue<>();
+        batch = new SpriteBatch();
+        renderer = new Renderer(batch);
+    }
 
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
@@ -88,24 +98,17 @@ public class GameScreen extends ScreenAdapter {
         return enemies;
     }
 
-    public GameScreen(TankGame game, UserInfo userInfo) {
-        this.game = game;
-        this.userInfo = userInfo;
-        playerNames = new HashMap<>();
-        chatMessages = new Queue<>();
-    }
-
     public void addScore(int deltaScore) {
         score += deltaScore;
         nextLevelScore += deltaScore;
         if (nextLevelScore >= Config.LEVEL_UP_SCORE) {
             int levelsToUp = nextLevelScore / Config.LEVEL_UP_SCORE;
-            LevelUp levelUp = new LevelUp();
+            /*LevelUp levelUp = new LevelUp();
             levelUp.healthPoints = levelsToUp * Config.HEALTH_POINTS_FOR_LEVEL_UP;
-            levelUp.level = levelsToUp;
+            levelUp.level = levelsToUp;*/
             player.levelUp(levelsToUp);
             player.addHealthPoints(Config.HEALTH_POINTS_FOR_LEVEL_UP);
-            networkManager.sendEvent(levelUp);
+            networkManager.sendEvent(new LevelUp(0, levelsToUp, levelsToUp * Config.HEALTH_POINTS_FOR_LEVEL_UP));
             nextLevelScore = nextLevelScore % Config.LEVEL_UP_SCORE;
         }
     }
@@ -115,29 +118,35 @@ public class GameScreen extends ScreenAdapter {
         viewport.update(width, height);
     }
 
-    @Override
-    public void show() {
-
+    private void loadResources() {
         tiledMap = game.getAssetManager().get("tiledmaps/tank_battles.tmx");
         TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer)tiledMap.getLayers().get("background");
         levelWidth = tiledMapTileLayer.getWidth() * tiledMapTileLayer.getTileWidth();
         levelHeight = tiledMapTileLayer.getHeight() * tiledMapTileLayer.getTileHeight();
+        backgroundMusic = game.getAssetManager().get("sound/background.mp3");
+        skin = new Skin(Gdx.files.internal("data/uiskin.json"));
+    }
+
+    @Override
+    public void show() {
         loadResources();
         initEntities();
         initNetwork();
         initCamera();
+        initChatUI();
+        sendCreatePlayerEvent();
+        initInputHandler();
+    }
 
+    private void initInputHandler() {
+        inputHandler = new InputHandler(player, networkManager, tiledMap, this);
+        collisionDetector = new CollisionDetector(this);
+    }
 
-
-        backgroundMusic = game.getAssetManager().get("sound/background.mp3");
-        backgroundMusic.setLooping(true);
-        backgroundMusic.play();
-
-
+    private void initChatUI() {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        Skin skin = new Skin(Gdx.files.internal("data/uiskin.json"));
         chatTextField = new TextField("", skin);
         chatTextField.setSize(200, 30);
         stage.addActor(chatTextField);
@@ -164,61 +173,24 @@ public class GameScreen extends ScreenAdapter {
         sendButton.setPosition(camera.position.x + DESKTOP_SCREEN_WIDTH / 2 - 50,
                 camera.position.y - DESKTOP_SCREEN_HEIGHT / 2 + 100, Align.bottomLeft);
         stage.addActor(sendButton);
-        //
+
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
+    }
+
+    private void sendCreatePlayerEvent() {
+        networkManager.sendEvent(new CreatePlayer(0, player.getX(), player.getY(),
+                player.getRotation(), player.getLevel(),
+                player.getHealthPoints(), userInfo.name));
     }
 
     private void initCamera() {
         camera = new OrthographicCamera();
-
-        batch = new SpriteBatch();
-        renderer = new Renderer(batch);
-
-        CreatePlayer createPlayer = new CreatePlayer();
-        createPlayer.x = player.getX();
-        createPlayer.y = player.getY();
-        createPlayer.healthPoints = player.getHealthPoints();
-        createPlayer.level = player.getLevel();
-        createPlayer.rotation = player.getRotation();
-        createPlayer.name = userInfo.name;
-        networkManager.sendEvent(createPlayer);
-        /*MoveTank moveTank = new MoveTank();
-        moveTank.rotation = player.getRotation();
-        moveTank.x = player.getX();
-        moveTank.y = player.getY();
-        networkManager.move(moveTank);*/
-        inputHandler = new InputHandler(player, networkManager, tiledMap, this);
-        collisionDetector = new CollisionDetector(this);
-
         orthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         orthogonalTiledMapRenderer.setView(camera);
-        /*float cameraX;
-        float cameraY;
-        if ((player.getX() + Config.DESKTOP_SCREEN_WIDTH / 2) > levelWidth) {
-            cameraX = levelWidth - Config.DESKTOP_SCREEN_WIDTH / 2;
-        }
-        else if ((player.getX() - Config.DESKTOP_SCREEN_WIDTH / 2) < 0) {
-            cameraX = Config.DESKTOP_SCREEN_WIDTH / 2;
-        }
-        else {
-            cameraX = player.getX();
-        }
-
-        if ((player.getY() + Config.DESKTOP_SCREEN_HEIGHT / 2) > levelHeight) {
-            cameraY = levelHeight - Config.DESKTOP_SCREEN_HEIGHT / 2;
-        }
-        else if ((player.getY() - Config.DESKTOP_SCREEN_HEIGHT / 2) < 0) {
-            cameraY = Config.DESKTOP_SCREEN_HEIGHT / 2;
-        }
-        else {
-            cameraY = player.getY();
-        }*/
         updateCamera();
-
         viewport = new FitViewport(Config.DESKTOP_SCREEN_WIDTH, Config.DESKTOP_SCREEN_HEIGHT, camera);
         viewport.apply(true);
-
-        /*camera.position.set(cameraX, cameraY, camera.position.z);
-        camera.update();*/
     }
 
     private void initEntities() {
@@ -231,10 +203,8 @@ public class GameScreen extends ScreenAdapter {
 
     private void initTanks() {
         do {
-            /*player = new Tank(TANK_TEXTURE, (MathUtils.random((int) levelWidth)),
-                    MathUtils.random((int) levelHeight),
-                    MathUtils.random(4) * 90);*/
-            player = new Tank(TANK_TEXTURE, 1400, 1400, 90);
+            player = new Tank(TextureManager.TANK_TEXTURE, MathUtils.random(levelWidth),
+                    MathUtils.random(levelHeight), MathUtils.random(4) * 90);
         } while (CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("indestructible"),
                 player.getCollisionModel()) ||
                 CollisionDetector.collidesWithLayer((TiledMapTileLayer) tiledMap.getLayers().get("impassable"),
@@ -243,16 +213,11 @@ public class GameScreen extends ScreenAdapter {
         enemies = new HashMap<>();
     }
 
-    private void loadResources() {
-
-    }
-
     @Override
     public void render(float delta) {
         super.render(delta);
         clearScreen();
         if (gameOver) {
-            System.out.println("GAME OVER!!!");
             networkManager.close();
             game.setScreen(new GameOverScreen(game, userInfo, score));
         }
@@ -320,19 +285,9 @@ public class GameScreen extends ScreenAdapter {
             cameraY = player.getY();
         }
 
-        /*viewport = new FitViewport(Config.DESKTOP_SCREEN_WIDTH, Config.DESKTOP_SCREEN_HEIGHT, camera);
-        viewport.apply(true);*/
-
         camera.position.set(cameraX, cameraY, camera.position.z);
         camera.update();
         orthogonalTiledMapRenderer.setView(camera);
-    }
-
-    private boolean isOutOfScreen(float x, float y) {
-        return ((x > Config.DESKTOP_SCREEN_WIDTH)
-                || (x < 0)
-                || (y > Config.DESKTOP_SCREEN_HEIGHT)
-                || (y < 0));
     }
 
     private void draw() {
@@ -340,7 +295,6 @@ public class GameScreen extends ScreenAdapter {
         batch.setTransformMatrix(camera.view);
         orthogonalTiledMapRenderer.render();
 
-        //clearScreen();
         batch.begin();
 
         drawEnemies();
@@ -376,22 +330,11 @@ public class GameScreen extends ScreenAdapter {
         for (Integer key : enemies.keySet()) {
             drawTank(enemies.get(key), playerNames.get(key));
         }
-        /*for (Tank enemy : enemies.values()) {
-            drawTank(enemy, ENEMY_TANK_TEXTURE, playerNames.get(key));
-        }*/
     }
 
     private void clearScreen() {
         Gdx.gl.glClearColor(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, Color.BLACK.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-    }
-
-    public int getNextLevelScore() {
-        return nextLevelScore;
-    }
-
-    public void setNextLevelScore(int nextLevelScore) {
-        this.nextLevelScore = nextLevelScore;
     }
 
     public HashMap getPlayerNames() {

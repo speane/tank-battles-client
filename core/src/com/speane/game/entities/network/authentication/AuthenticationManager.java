@@ -19,6 +19,7 @@ public class AuthenticationManager {
     private final String WRONG_LOGIN_CODE = "402";
     private final String WRONG_PASSWORD_CODE = "403";
     private final String USER_EXISTS_CODE = "405";
+    private final String ALREADY_AUTHORIZED_CODE = "407";
     private String host;
     private int port;
     private Gson gsonSerializer;
@@ -29,7 +30,8 @@ public class AuthenticationManager {
         gsonSerializer = new Gson();
     }
 
-    public UserInfo authorize(String login, String password) throws IOException, NoSuchUserException, WrongPasswordException {
+    public UserInfo authorize(String login, String password) throws IOException, NoSuchUserException,
+            WrongPasswordException, UserAuthorizedException {
         Socket serverSocket = new Socket(host, port);
         new RequestSender(serverSocket).sendAuthorizationRequest(new AuthorizationRequest(login, password));
         HttpResponse response = new ResponseReceiver(serverSocket).getNextResponse();
@@ -42,6 +44,8 @@ public class AuthenticationManager {
                     throw new NoSuchUserException();
                 case WRONG_PASSWORD_CODE:
                     throw new WrongPasswordException();
+                case ALREADY_AUTHORIZED_CODE:
+                    throw new UserAuthorizedException();
                 default:
                     return null;
             }
