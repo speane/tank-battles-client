@@ -79,7 +79,7 @@ public class InputHandler {
             ShootTank shootTank = new ShootTank(PLAYER_INIT_ID, bullet.getRotation(), bullet.getX(), bullet.getY());
             networkManager.sendEvent(shootTank);
 
-            Resourses.shootSound.play();
+            //Resourses.shootSound.play();
         }
 
         if (moved || rotated) {

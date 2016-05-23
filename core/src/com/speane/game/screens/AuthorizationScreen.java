@@ -1,33 +1,12 @@
 package com.speane.game.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.speane.game.TankGame;
-import com.speane.game.entities.network.authentication.AuthenticationManager;
-import com.speane.game.entities.network.authentication.NoSuchUserException;
-import com.speane.game.entities.network.authentication.WrongPasswordException;
-import com.speane.game.entities.network.userinfo.UserInfo;
-import com.speane.game.help.Config;
-
-import java.io.IOException;
-
-import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
-import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
-import static com.speane.game.help.TextureManager.START_MENU_BACKGROUND_TEXTURE;
 
 /**
  * Created by Evgeny Shilov on 19.05.2016.
  */
 public class AuthorizationScreen extends ScreenAdapter {
-    private final int FIELD_WIDTH = 150;
+    /*private final int FIELD_WIDTH = 150;
     private final int FIELD_HEIGHT = 30;
     private final int INDENT = 50;
     private final String CONNECTION_ERROR_TEXT_MESSAGE = "Can't connect to server";
@@ -155,5 +134,5 @@ public class AuthorizationScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         stage.dispose();
-    }
+    }*/
 }

@@ -2,6 +2,8 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -46,6 +48,9 @@ public class LoadingScreen extends ScreenAdapter {
         shapeRenderer = new ShapeRenderer();
         game.getAssetManager().load("textures/archive/tank_battles_assets.atlas", TextureAtlas.class);
         game.getAssetManager().load("tiledmaps/tank_battles.tmx", TiledMap.class);
+        game.getAssetManager().load("sound/background.mp3", Music.class);
+        game.getAssetManager().load("sound/blast.wav", Sound.class);
+        game.getAssetManager().load("sound/hit.wav", Sound.class);
     }
 
     @Override

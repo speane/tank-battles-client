@@ -3,7 +3,6 @@ package com.speane.game.help;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.speane.game.entities.MovingObject;
 
 /**
@@ -23,7 +22,7 @@ public class Renderer {
         font.draw(batch, text, x, y);
     }
 
-    public void draw(MovingObject entity, TextureRegion texture) {
+    public void draw(MovingObject entity) {
         batch.draw(
                 entity.getTexture(),
                 entity.getX(),
@@ -36,9 +35,5 @@ public class Renderer {
                 1,
                 entity.getRotation()
         );
-    }
-
-    public void showMessage(String message) {
-        font.draw(batch, message, Config.DESKTOP_SCREEN_WIDTH / 2 - 100, Config.DESKTOP_SCREEN_HEIGHT / 2 + 100);
     }
 }

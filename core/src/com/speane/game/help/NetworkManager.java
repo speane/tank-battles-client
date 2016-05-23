@@ -17,7 +17,6 @@ import static com.speane.game.help.Config.*;
 import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
 import static com.speane.game.help.TextureManager.ENEMY_TANK_TEXTURE;
 
-//import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.
@@ -39,7 +38,7 @@ public class NetworkManager {
         try {
             client.connect(CLIENT_WAIT_TIMEOUT, SERVER_HOST, PLAY_PORT);
         } catch (IOException e) {
-            System.out.println("CONNECTION FAILED");
+            System.err.println(e);
         }
         initNetworkListener();
     }
@@ -59,66 +58,26 @@ public class NetworkManager {
         Listener listener = new Listener() {
             @Override
             public void received(Connection c, Object o) {
-                System.out.println(o.getClass());
                 if (o instanceof MoveTank) {
-                    MoveTank moveTank = (MoveTank) o;
-                    Tank enemy = enemies.get(moveTank.id);
-                    enemy.setPosition(moveTank.x, moveTank.y);
-                    enemy.setRotation(moveTank.rotation);
+                    moveTankEvent((MoveTank) o);
                 }
                 else if (o instanceof CreatePlayer) {
-                    CreatePlayer newPlayer = (CreatePlayer) o;
-                    Tank newTank = new Tank(ENEMY_TANK_TEXTURE, newPlayer.x, newPlayer.y, newPlayer.rotation);
-                    newTank.setLevel(newPlayer.level);
-                    newTank.setHealthPoints(newPlayer.healthPoints);
-                    enemies.put(newPlayer.id, newTank);
-                    gameScreen.getPlayerNames().put(newPlayer.id, newPlayer.name);
-                    for (Integer key : enemies.keySet()) {
-                        System.out.println("KEY: " + key + " enemy: " + enemies.get(key));
-                    }
+                    createPlayerEvent((CreatePlayer) o);
                 }
                 else if (o instanceof ShootTank) {
-                    ShootTank shootTank = (ShootTank) o;
-                    Tank tank = enemies.get(shootTank.id);
-                    tank.shoot(new Bullet(BULLET_TEXTURE, shootTank.x, shootTank.y, shootTank.rotation));
-                    System.out.println("Shoot " + ((ShootTank) o).id);
+                    shootTankEvent((ShootTank) o);
                 }
                 else if (o instanceof SendMessage) {
-                    SendMessage sendMessage = (SendMessage) o;
-                    gameScreen.getChatMessages().addFirst(gameScreen.getPlayerNames().get(sendMessage.id)
-                            + ": " + sendMessage.message);
-                    if (gameScreen.getChatMessages().size > 5) {
-                        gameScreen.getChatMessages().removeLast();
-                    }
+                    sendMessageEvent((SendMessage) o);
                 }
                 else if (o instanceof DeadTank) {
-                    DeadTank deadTank = (DeadTank) o;
-                    System.out.println("Killer: " + deadTank.killerID);
-
-                    enemies.remove(deadTank.id);
-                    if (!enemies.containsKey(deadTank.killerID)) {
-                        gameScreen.addScore(Config.SCORE_FOR_KILL);
-                    }
+                    deadTankEvent((DeadTank) o);
                 }
                 else if (o instanceof HitTank) {
-                    HitTank hitTank = (HitTank) o;
-                    if (enemies.containsKey(hitTank.shooterID)) {
-                        enemies.get(hitTank.shooterID).hit(enemies.get(hitTank.id));
-                    }
-                    else {
-                        gameScreen.getPlayer().hit(enemies.get(hitTank.id));
-                        gameScreen.addScore(Config.SCORE_FOR_HIT);
-                    }
-                    /*enemies.get(hitTank.id).subHealthPoints(hitTank.damage);
-                    if (enemies.get(hitTank.id).isDead()) {
-                        enemies.remove(hitTank.id);
-                    }*/
+                    hitTankEvent((HitTank) o);
                 }
                 else if (o instanceof LevelUp) {
-                    LevelUp levelUp = (LevelUp) o;
-                    System.out.println("lvlup: " + levelUp.id + " " + levelUp.level);
-                    enemies.get(levelUp.id).levelUp(levelUp.level);
-                    enemies.get(levelUp.id).addHealthPoints(levelUp.healthPoints);
+                    levelUpEvent((LevelUp) o);
                 }
             }
         };
@@ -131,16 +90,57 @@ public class NetworkManager {
         });
     }
 
+    private void moveTankEvent(MoveTank moveTank) {
+        Tank enemy = enemies.get(moveTank.id);
+        enemy.setPosition(moveTank.x, moveTank.y);
+        enemy.setRotation(moveTank.rotation);
+    }
+
+    private void createPlayerEvent(CreatePlayer newPlayer) {
+        Tank newTank = new Tank(ENEMY_TANK_TEXTURE, newPlayer.x, newPlayer.y, newPlayer.rotation);
+        newTank.setLevel(newPlayer.level);
+        newTank.setHealthPoints(newPlayer.healthPoints);
+        enemies.put(newPlayer.id, newTank);
+        gameScreen.getPlayerNames().put(newPlayer.id, newPlayer.name);
+    }
+
+    private void shootTankEvent(ShootTank shootTank) {
+        Tank tank = enemies.get(shootTank.id);
+        tank.shoot(new Bullet(BULLET_TEXTURE, shootTank.x, shootTank.y, shootTank.rotation));
+    }
+
+    private void sendMessageEvent(SendMessage sendMessage) {
+        gameScreen.getChatMessages().addFirst(gameScreen.getPlayerNames().get(sendMessage.id)
+                + ": " + sendMessage.message);
+        if (gameScreen.getChatMessages().size > 5) {
+            gameScreen.getChatMessages().removeLast();
+        }
+    }
+
+    private void deadTankEvent(DeadTank deadTank) {
+        enemies.remove(deadTank.id);
+        if (!enemies.containsKey(deadTank.killerID)) {
+            gameScreen.addScore(Config.SCORE_FOR_KILL);
+        }
+    }
+
+    private void hitTankEvent(HitTank hitTank) {
+        if (enemies.containsKey(hitTank.shooterID)) {
+            enemies.get(hitTank.shooterID).hit(enemies.get(hitTank.id));
+        }
+        else {
+            gameScreen.getPlayer().hit(enemies.get(hitTank.id));
+            gameScreen.addScore(Config.SCORE_FOR_HIT);
+        }
+    }
+
+    private void levelUpEvent(LevelUp levelUp) {
+        enemies.get(levelUp.id).levelUp(levelUp.level);
+        enemies.get(levelUp.id).addHealthPoints(levelUp.healthPoints);
+    }
+
     public <T> void sendEvent(T event) {
         client.sendTCP(event);
-    }
-
-    public void shoot(ShootTank shootTank) {
-        client.sendTCP(shootTank);
-    }
-
-    public void move(MoveTank moveTank) {
-        client.sendTCP(moveTank);
     }
 
     public void close() {

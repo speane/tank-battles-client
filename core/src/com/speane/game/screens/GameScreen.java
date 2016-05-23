@@ -2,11 +2,11 @@ package com.speane.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -36,12 +36,14 @@ import java.util.Map;
 
 import static com.speane.game.help.Config.DESKTOP_SCREEN_HEIGHT;
 import static com.speane.game.help.Config.DESKTOP_SCREEN_WIDTH;
-import static com.speane.game.help.TextureManager.*;
+import static com.speane.game.help.TextureManager.TANK_TEXTURE;
 
 /**
  * Created by Speane on 08.03.2016.
  */
 public class GameScreen extends ScreenAdapter {
+    private Music backgroundMusic;
+
     private boolean gameOver = false;
     private int score;
     private int nextLevelScore;
@@ -127,8 +129,9 @@ public class GameScreen extends ScreenAdapter {
 
 
 
-        Resourses.backgroundMusic.setLooping(true);
-        Resourses.backgroundMusic.play();
+        backgroundMusic = game.getAssetManager().get("sound/background.mp3");
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
 
 
         stage = new Stage(viewport);
@@ -341,7 +344,7 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
 
         drawEnemies();
-        drawTank(player, TANK_TEXTURE, userInfo.name);
+        drawTank(player, userInfo.name);
         renderer.drawText("Health: " + player.getHealthPoints(),
                 (int) (camera.position.x - Config.DESKTOP_SCREEN_WIDTH / 2),
                 (int) (camera.position.y + Config.DESKTOP_SCREEN_HEIGHT / 2));
@@ -356,8 +359,8 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
     }
 
-    private void drawTank(Tank tank, TextureRegion texture, String playerName) {
-        renderer.draw(tank, texture);
+    private void drawTank(Tank tank, String playerName) {
+        renderer.draw(tank);
         renderer.drawText("[" + tank.getLevel() + " lvl] " + tank.getHealthPoints() + "hp",
                 tank.getX() - 10,
                 (int) (tank.getY() + tank.getCollisionModel().getHeight() + 30));
@@ -365,13 +368,13 @@ public class GameScreen extends ScreenAdapter {
                 tank.getX() - 10,
                 (int) (tank.getY() + tank.getCollisionModel().getHeight() + 50));
         for (Bullet bullet : tank.getBullets()) {
-            renderer.draw(bullet, BULLET_TEXTURE);
+            renderer.draw(bullet);
         }
     }
 
     private void drawEnemies() {
         for (Integer key : enemies.keySet()) {
-            drawTank(enemies.get(key), ENEMY_TANK_TEXTURE, playerNames.get(key));
+            drawTank(enemies.get(key), playerNames.get(key));
         }
         /*for (Tank enemy : enemies.values()) {
             drawTank(enemy, ENEMY_TANK_TEXTURE, playerNames.get(key));

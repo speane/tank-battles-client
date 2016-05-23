@@ -3,7 +3,7 @@ package com.speane.game.entities.network.transfers;
 /**
  * Created by Evgeny Shilov on 05.04.2016.
  */
-public class DeadTank {
+public class DeadTank implements NetworkTransfer {
     public int id;
     public int killerID;
 
