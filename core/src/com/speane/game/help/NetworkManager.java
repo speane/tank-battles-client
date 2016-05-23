@@ -14,9 +14,10 @@ import java.io.IOException;
 import java.util.Map;
 
 import static com.speane.game.help.Config.*;
-import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
 import static com.speane.game.help.TextureManager.BULLET_TEXTURE;
 import static com.speane.game.help.TextureManager.ENEMY_TANK_TEXTURE;
+
+//import static com.speane.game.help.Messages.CONNECTION_FAILED_MESSAGE;
 
 /**
  * Created by Evgeny Shilov on 06.04.2016.
@@ -38,7 +39,7 @@ public class NetworkManager {
         try {
             client.connect(CLIENT_WAIT_TIMEOUT, SERVER_HOST, PLAY_PORT);
         } catch (IOException e) {
-            System.out.println(CONNECTION_FAILED_MESSAGE);
+            System.out.println("CONNECTION FAILED");
         }
         initNetworkListener();
     }

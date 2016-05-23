@@ -13,7 +13,7 @@ public class MoveTank {
 
     }
 
-    public MoveTank(int id, int x, int y, int rotation) {
+    public MoveTank(int id, int x, int y, float rotation) {
         this.id = id;
         this.x = x;
         this.y = y;

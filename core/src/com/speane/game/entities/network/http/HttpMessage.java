@@ -22,7 +22,7 @@ public class HttpMessage {
     }
 
     public void setMessageBody(byte[] messageBody) {
-        String CONTENT_LENGTH_HEADER_NAME = "Content_Length";
+        String CONTENT_LENGTH_HEADER_NAME = "Content-Length";
         this.messageBody = messageBody;
         headers.put(CONTENT_LENGTH_HEADER_NAME, Integer.toString(messageBody.length));
     }

@@ -44,7 +44,6 @@ public class InputHandler {
             gameScreen.setGameOver(true);
             return;
         }
-
         if (lPressed) {
             tank.rotate(Direction.LEFT);
             rotated = true;
@@ -62,31 +61,30 @@ public class InputHandler {
             moved = true;
         }
 
+        String INDESTRUCTIBLE_LAYER_NAME = "indestructible";
+        String IMPASSABLE_LAYER_NAME = "impassable";
         if (moved) {
-            if (CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get("indestructible"),
+            if (CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get(INDESTRUCTIBLE_LAYER_NAME),
                     tank.getCollisionModel()) ||
-                    CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get("impassable"),
+                    CollisionDetector.collidesWithLayer((TiledMapTileLayer)tiledMap.getLayers().get(IMPASSABLE_LAYER_NAME),
                             tank.getCollisionModel())) {
                 tank.setPosition(oldX, oldY);
             }
         }
 
+        int PLAYER_INIT_ID = 0;
+
         if (spacePressed) {
             Bullet bullet = tank.shoot();
-            ShootTank shootTank = new ShootTank();
-            shootTank.rotation = bullet.getRotation();
-            shootTank.x = bullet.getX();
-            shootTank.y = bullet.getY();
-            networkManager.shoot(shootTank);
+            ShootTank shootTank = new ShootTank(PLAYER_INIT_ID, bullet.getRotation(), bullet.getX(), bullet.getY());
+            networkManager.sendEvent(shootTank);
+
             Resourses.shootSound.play();
         }
 
         if (moved || rotated) {
-            MoveTank moveTank = new MoveTank();
-            moveTank.x = tank.getX();
-            moveTank.y = tank.getY();
-            moveTank.rotation = tank.getRotation();
-            networkManager.move(moveTank);
+            MoveTank moveTank = new MoveTank(PLAYER_INIT_ID, tank.getX(), tank.getY(), tank.getRotation());
+            networkManager.sendEvent(moveTank);
         }
     }
 }

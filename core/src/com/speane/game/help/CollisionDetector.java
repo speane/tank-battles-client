@@ -54,9 +54,7 @@ public class CollisionDetector {
     }
 
     public void checkCollisions() {
-        Iterator<Integer> firstEnemyKeyIterator = enemies.keySet().iterator();
-        while (firstEnemyKeyIterator.hasNext()) {
-            int firstKey = firstEnemyKeyIterator.next();
+        for (Integer firstKey : enemies.keySet()) {
             Tank firstEnemy = enemies.get(firstKey);
             Iterator<Bullet> bulletIterator = firstEnemy.getBullets().iterator();
             while (bulletIterator.hasNext()) {
@@ -73,17 +71,14 @@ public class CollisionDetector {
                 }
                 if (!bulletRemoved && isCollision(bullet, player)) {
                     bulletIterator.remove();
-
                     firstEnemy.hit(player);
-                    HitTank hitTank = new HitTank();
-                    hitTank.damage = firstEnemy.getDamage();
-                    hitTank.shooterID = firstKey;
+
+                    int PLAYER_INIT_ID = 0;
+                    HitTank hitTank = new HitTank(PLAYER_INIT_ID, firstEnemy.getDamage(), firstKey);
                     networkManager.sendEvent(hitTank);
 
                     if (player.isDead()) {
-                        DeadTank deadTank = new DeadTank();
-                        deadTank.killerID = firstKey;
-                        networkManager.sendEvent(deadTank);
+                        networkManager.sendEvent(new DeadTank(PLAYER_INIT_ID, firstKey));
                         gameScreen.setGameOver(true);
                         return;
                     }
@@ -97,66 +92,9 @@ public class CollisionDetector {
                 }
             }
         }
-
-
-        /*Iterator<Tank> enemyIterator = enemies.values().iterator();
-        while (enemyIterator.hasNext()) {
-            Tank enemy = enemyIterator.next();
-            Iterator<Bullet> bulletIterator = enemy.getBullets().iterator();
-            while (bulletIterator.hasNext()) {
-                Bullet bullet = bulletIterator.next();
-                if (isCollision(player, bullet)) {
-                    bulletIterator.remove();
-                    enemy.hit(player);
-                    if (player.isDead()) {
-                        networkManager.sendEvent(new DeadTank());
-                        gameScreen.setGameOver(true);
-                        return;
-                    }
-                    else {
-                        HitTank hitTank = new HitTank();
-                        hitTank.damage = enemy.getDamage();
-                        networkManager.sendEvent(hitTank);
-                    }
-                }
-            }
-            Iterator<Bullet> playerBulletIterator = player.getBullets().iterator();
-            while (playerBulletIterator.hasNext()) {
-                Bullet bullet = playerBulletIterator.next();
-                if (isCollision(bullet, enemy)) {
-                    int oldScore = gameScreen.getScore();
-                    gameScreen.setScore(oldScore
-                            + ((int) (Config.SCORE_FOR_HIT / ((double) player.getLevel() / enemy.getLevel()))));
-                    playerBulletIterator.remove();
-                    if (enemy.isDead()) {
-                        gameScreen.setScore(oldScore +
-                                ((int) (Config.SCORE_FOR_KILL / ((double) player.getLevel() / enemy.getLevel()))));
-                    }
-                    gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() + gameScreen.getScore() - oldScore);
-                    if (gameScreen.getNextLevelScore() >= Config.LEVEL_UP_SCORE) {
-                        int levelsToUp = gameScreen.getNextLevelScore() / Config.LEVEL_UP_SCORE;
-                        player.levelUp(levelsToUp);
-                        player.addHealthPoints(Config.HEALTH_POINTS_FOR_LEVEL_UP);
-                        LevelUp levelUp = new LevelUp();
-                        levelUp.level = levelsToUp;
-                        levelUp.healthPoints = Config.HEALTH_POINTS_FOR_LEVEL_UP;
-                        networkManager.sendEvent(levelUp);
-                        gameScreen.setNextLevelScore(gameScreen.getNextLevelScore() % Config.LEVEL_UP_SCORE);
-                    }
-                }
-            }*/
     }
 
-    public boolean isOutOfField(GameObject object) {
-        float x = object.getX();
-        float y = object.getY();
-        return  x > Config.DESKTOP_SCREEN_WIDTH ||
-                x < 0 ||
-                y > Config.DESKTOP_SCREEN_HEIGHT ||
-                x < 0;
-    }
-
-    public boolean isCollision(GameObject first, GameObject second) {
+    private boolean isCollision(GameObject first, GameObject second) {
         float left1 = first.getX();
         float right1 = left1 + first.getWidth();
         float bottom1 = first.getY();

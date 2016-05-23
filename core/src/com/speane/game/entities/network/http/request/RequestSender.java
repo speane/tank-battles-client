@@ -68,6 +68,9 @@ public class RequestSender {
         LoginInfo loginInfo = new LoginInfo(request.getLogin(), request.getPassword());
         httpRequest.setMessageBody(gsonSerializer.toJson(loginInfo).getBytes(Charset.forName(DEFAULT_CHARSET)));
 
+        System.out.println("-----");
+        System.out.println(new String(httpRequest.getMessageBody()));
+
         sendRequest(httpRequest);
     }
 
